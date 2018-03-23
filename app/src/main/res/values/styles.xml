@@ -1,0 +1,46 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+
+    <style name="AlertDialogTextTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/sp_setting</item>
+        <item name="android:textSize">@dimen/sp_20</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">@dimen/dp_10</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:layout_margin">@dimen/dp_2</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+
+    <style name="AlertDialogTextContent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/sp_18</item>
+        <item name="android:padding">@dimen/dp_10</item>
+        <item name="android:layout_margin">@dimen/dp_2</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+
+    <style name="AlertDialogButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:layout_margin">@dimen/dp_2</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/sp_18</item>
+    </style>
+
+</resources>

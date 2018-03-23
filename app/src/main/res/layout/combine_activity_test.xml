@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.skycaster.sotenmapper.activity.CombineTestActivity">
+
+    <ToggleButton
+        android:id="@+id/act_test_tgbtn_cd_radio_pw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:textOn="SK9042 On"
+        android:textOff="SK9042 Off"/>
+
+    <ToggleButton
+        android:id="@+id/act_test_tgbtn_gps_pw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:textOn="Gps On"
+        android:textOff="Gps Off"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@android:color/holo_orange_light">
+            <Button
+                android:id="@+id/act_test_btn_cd_radio_sp_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SK9042串口设置"/>
+            <!--<Button-->
+                <!--android:id="@+id/act_test_btn_gps_sp_setting"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="GPS串口设置"/>-->
+            <ListView
+                android:id="@+id/act_test_lstv_cd_radio_func_menu"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+        <ListView
+            android:id="@+id/act_test_lstv_feed_back_console"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

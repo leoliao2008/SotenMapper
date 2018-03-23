@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.skycaster.sotenmapper.activity.GPSTestActivity">
+    <ToggleButton
+        android:id="@+id/tgbtn_sk9042"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textOn="SK9042 On"
+        android:textOff="SK9042 Off"
+        android:textAllCaps="false"/>
+    <ToggleButton
+        android:id="@+id/tgbtn_gps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textOn="GPS On"
+        android:textOff="GPS Off"
+        android:textAllCaps="false"/>
+    <!--<Button-->
+        <!--android:id="@+id/btn_sp_setting"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/sp_setting"/>-->
+
+    <ListView
+        android:id="@+id/list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

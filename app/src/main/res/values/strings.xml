@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">SotenMapper</string>
+    <string name="sp_setting">串口设置</string>
+    <string name="path">路径</string>
+    <string name="bd_rate">波特率</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="function_not_available">此功能未开通！</string>
+    <string name="choose_bd_rate">选择波特率</string>
+    <string name="blank">空值</string>
+    <string name="please_input_freq">请输入主频</string>
+    <string name="please_set_receive_mode">请设置接收模式</string>
+    <string name="please_set_running_mode">请设置运行模式</string>
+    <string name="CKFO_function">数据输出校验功能</string>
+    <string name="_1pps_function">1PPS功能：</string>
+    <string name="set_log_level">设置Log等级</string>
+    <string name="gps_module_test">GPS模块测试</string>
+    <string name="sk9042_module_test">SK9042模块测试</string>
+    <string name="conbine_test">联合测试</string>
+    <array name="sk9042_functions">
+        <item>测试连接</item>
+        <item>算法复位</item>
+        <item>日期时间</item>
+        <item>设置波特率</item>
+        <item>查询波特率</item>
+        <item>设置频点</item>
+        <item>查询频点</item>
+        <item>设置接收模式</item>
+        <item>查询接收模式</item>
+        <item>设置运行模式</item>
+        <item>查询运行模式</item>
+        <item>设置数据输出校验功能</item>
+        <item>查询数据输出校验功能</item>
+        <item>设置1PPS开</item>
+        <item>设置1PPS关</item>
+        <item>查询1PPS开关</item>
+        <item>启动升级</item>
+        <item>启动升级数据传输</item>
+        <item>查询软件版本</item>
+        <item>设置产品ID</item>
+        <item>查询产品ID</item>
+        <item>查询信噪比</item>
+        <item>查询接收状态</item>
+        <item>查询时偏</item>
+        <item>查询频偏</item>
+        <item>查询Tuner状态</item>
+        <item>译码统计</item>
+        <item>Log等级设置</item>
+    </array>
+</resources>

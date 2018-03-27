@@ -172,6 +172,12 @@ public class CDRadioTestPresenter extends BasePresenter {
             super.getLDPC(passCnt, failCnt);
             updateConsole("译码统计：成功次数"+passCnt+"失败次数"+failCnt);
         }
+
+        @Override
+        public void setLogLevel(boolean isSuccess) {
+            super.setLogLevel(isSuccess);
+            updateConsole("Log等级设置："+isSuccess);
+        }
     };
     private AckDecipher mAckDecipher=new AckDecipher(mRequestCallBack);
 
@@ -200,6 +206,11 @@ public class CDRadioTestPresenter extends BasePresenter {
 
     @Override
     public void onResume() {
+
+    }
+
+    @Override
+    public void onPause() {
 
     }
 

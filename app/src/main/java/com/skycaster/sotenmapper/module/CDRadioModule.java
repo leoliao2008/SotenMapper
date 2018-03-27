@@ -1,9 +1,11 @@
 package com.skycaster.sotenmapper.module;
 
 import android.os.PowerManager;
+import android.util.Log;
 
 import com.skycaster.sk9042_lib.ack.AckDecipher;
 import com.skycaster.sk9042_lib.request.InputFormatException;
+import com.skycaster.sotenmapper.utils.StreamOptimizer;
 import com.soten.libs.utils.LogUtils;
 import com.soten.libs.utils.PowerManagerUtils;
 
@@ -33,6 +35,7 @@ public class CDRadioModule {
     public CDRadioModule(PowerManager manager) {
         mSerialPortModule=new SerialPortModule();
         mPowerManager=manager;
+
     }
 
     /**
@@ -53,14 +56,19 @@ public class CDRadioModule {
     public void openConnection(String path, int bdRate, final AckDecipher ackDecipher) throws IOException, SecurityException, InterruptedException {
         closeConnection();
         mSerialPort=mSerialPortModule.openSerialPort(path,bdRate);
-//        mRevTread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                isInterrupted=false;
-//                mInputStream = mSerialPort.getInputStream();
-//                while (!isInterrupted){
-//                    showLog("reading from input stream...");
-//                    try {
+        if(mSerialPort!=null){
+            mRevTread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    isInterrupted=false;
+                    mInputStream = mSerialPort.getInputStream();
+                    int fd = mSerialPort.getParcelFileDescriptor().getFd();
+                    StreamOptimizer optimizer = new StreamOptimizer();
+                    optimizer.open();
+                    optimizer.addFd(fd,1);
+                    while (!isInterrupted){
+//                        showLog("reading from input stream...");
+                        try {
 //                        if(mInputStream.available()>0){
 //                            int len = mInputStream.read(mPortData);
 //                            if(len>0){
@@ -78,31 +86,52 @@ public class CDRadioModule {
 //                        } catch (InterruptedException e) {
 //                            e.printStackTrace();
 //                        }
-//                    } catch (IOException e) {
-//                        showLog("IOException:"+e.getMessage());
-//                        break;
-//                    }
-//                }
-//            }
-//        });
-//        mRevTread.start();
-        mAckDecipher=ackDecipher;
-        mAckDecipher.decipherByStream(mSerialPort.getInputStream());
+
+                            int available = optimizer.pollInner(300);
+//                            showLog("available = "+available);
+                            if(available>0){
+                                int len = mInputStream.read(mPortData);
+                                if(len>0){
+                                    Log.e("Port Data",new String(mPortData,0,len));
+                                    try {
+                                        ackDecipher.decipherByBytes(mPortData,len);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                        break;
+                                    }
+                                }
+                            }
+                        } catch (IOException e) {
+                            showLog("IOException:"+e.getMessage());
+                            break;
+                        }
+                    }
+                    optimizer.removeFd(fd);
+                    optimizer.close();
+                    optimizer=null;
+                }
+            });
+            mRevTread.start();
+//        mAckDecipher=ackDecipher;
+//        mAckDecipher.decipherByStream(mSerialPort.getInputStream());
+        }
+
     }
 
 
     public void closeConnection() throws InterruptedException {
+        if(mRevTread!=null&&mRevTread.isAlive()){
+            isInterrupted=true;
+            mRevTread.join();
+        }
+        if(mAckDecipher!=null){
+            mAckDecipher.stopDecipherByStream();
+        }
         if(mSerialPort!=null){
-//            if(mRevTread!=null&&mRevTread.isAlive()){
-//                isInterrupted=true;
-//                mRevTread.join();
-//            }
-            if(mAckDecipher!=null){
-                mAckDecipher.stopDecipherByStream();
-            }
             mSerialPortModule.close(mSerialPort);
             mSerialPort=null;
         }
+
     }
 
     public void testConnection() throws IOException {

@@ -152,6 +152,11 @@ public class GPSTestPresenter extends BasePresenter {
     }
 
     @Override
+    public void onPause() {
+
+    }
+
+    @Override
     public void onStop() {
 //        if(mActivity.isFinishing()){
 //            mGpsModule.powerOff();

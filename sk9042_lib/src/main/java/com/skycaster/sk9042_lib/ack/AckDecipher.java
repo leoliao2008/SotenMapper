@@ -23,12 +23,18 @@ public class AckDecipher {
     private byte[] temp=new byte[Static.ACK_SIZE];
 
 
+
     //**********************************************函数****************************************
     public AckDecipher(RequestCallBack callBack) {
         mCallBack = callBack;
     }
 
 
+    /**
+     * 以串口输入流作为参数，自动新建一条线程解析串口数据
+     * @param inputStream 串口输入流
+     * @throws InterruptedException
+     */
     public synchronized void decipherByStream(final InputStream inputStream) throws InterruptedException {
         stopDecipherByStream();
         mRevThread = new Thread(new Runnable() {
@@ -38,7 +44,6 @@ public class AckDecipher {
                 while (!isInterrupted){
                     try {
                         int available = inputStream.available();
-                        showLog("available ="+available);
                         if(available >0){
                             int read = inputStream.read(temp);
                             try {
@@ -72,12 +77,12 @@ public class AckDecipher {
     }
 
     /**
-     * 解析当前数据。
+     * 以CDRadio模块串口发过来的数据包作为参数解析当前数据。
      * @param data CDRadio模块串口发过来的数据包
      * @param len 数据包有效字节长度
      * @throws InterruptedException
      */
-    private synchronized void decipherByBytes(byte[] data, int len) throws InterruptedException {
+    public synchronized void decipherByBytes(byte[] data, int len) throws InterruptedException {
         for (int i = 0; i < len; i++) {
             if (isAckConfirmed) {
                 ack[mIndex] = data[i];
@@ -95,8 +100,6 @@ public class AckDecipher {
             if (data[i] == '+') {
                 ack[mIndex++] = data[i];
                 isAckConfirmed = true;
-            }else {
-                showLog("ack is not confirmed.");
             }
         }
     }
@@ -109,10 +112,10 @@ public class AckDecipher {
      */
     private void decipherBySk9042Protocol(byte[] ack, int len) {
         showLog("begin to decipherByBytes...");
-        showLog(hexToString(ack,len));
+//        showLog(hexToString(ack,len));
         //把“+”号去掉，把后面的换行符给trim掉
         String trim = new String(ack, 0, len).substring(1, len).trim();
-        showLog(trim);
+        showLog("remove + and \\r\\n: "+trim);
         String[] split=null;
         if(trim.contains("=")){
             //如果ack中包含“=”号，就按等号分开2段。
@@ -123,14 +126,14 @@ public class AckDecipher {
         }else if(trim.equals("OK")){
             mCallBack.testConnection(true);
         }
-        //测试用，正式删
-        if(split!=null){
-            for(String s:split){
-                showLog("split:"+s);
-            }
-        }else {
-            showLog("split == null!");
-        }
+//        //测试用，正式删
+//        if(split!=null){
+//            for(String s:split){
+//                showLog("split:"+s);
+//            }
+//        }else {
+//            showLog("split == null!");
+//        }
 
         if(split!=null&&split.length>0){
             switch (split[0]){
@@ -244,9 +247,30 @@ public class AckDecipher {
                     break;
                 case "LDPC":
                     String[] spl2 = split[1].split(",");
+                    for(String temp:spl2){
+                        showLog("XXXXXXXXXXX:"+temp);
+                    }
                     if(spl2.length==2){
                         mCallBack.getLDPC(spl2[0],spl2[1]);
+                    }else {
+                        showLog("spl2 lengh = "+spl2.length);
                     }
+                    break;
+                case "LOG":
+                    if(split[1].equals("OK")){
+                        mCallBack.setLogLevel(true);
+                    }else if(split[1].equals("ERROR")){
+                        mCallBack.setLogLevel(false);
+                    }
+                    break;
+                case "STUD":
+                    if(split[1].equals("OK")){
+                        mCallBack.setLogLevel(true);
+                    }else if(split[1].equals("ERROR")){
+                        mCallBack.setLogLevel(false);
+                    }
+                    break;
+                default:
                     break;
             }
         }

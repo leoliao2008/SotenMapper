@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 
+import com.baidu.mapapi.SDKInitializer;
 import com.skycaster.sotenmapper.impl.Static;
 
 /**
@@ -21,6 +22,8 @@ public class BaseApplication extends Application {
         SP=getSharedPreferences(Static.SHARED_PREFERENCES_NAME,MODE_PRIVATE);
         HANDLER=new Handler();
         mContext=getApplicationContext();
+        //初始化百度地图
+        SDKInitializer.initialize(mContext);
     }
 
     public static SharedPreferences getSharedPreferences() {

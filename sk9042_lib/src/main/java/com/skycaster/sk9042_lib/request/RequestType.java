@@ -38,7 +38,7 @@ public enum RequestType {
             case CHECK_RUN_MODE:
                 return "AT+RM?";
             case SYS_UPGRADE_START:
-                return "AT+STUD";
+                return "AT+STUD:";
             case SYS_UPGRADE_UPLOAD_DATA:
                 return "AT+UDDA";
             case TOGGLE_1PPS:

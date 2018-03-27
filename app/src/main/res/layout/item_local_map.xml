@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/ListViewItemStyle1">
+
+    <TextView
+        android:id="@+id/tv_city"
+        android:text="@string/test"
+        style="@style/MenuTextStyle"
+        android:textSize="@dimen/sp_18"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_alignBottom="@id/tv_city"
+        android:layout_margin="@dimen/dp_2"
+        android:progress="100"/>
+    <TextView
+        android:id="@+id/tv_download_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/tv_city"
+        android:text="80%"
+        android:gravity="center"
+        android:textColor="@android:color/holo_red_dark"
+        />
+    <Button
+        android:id="@+id/btn_update"
+        android:text="@string/update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"/>
+    <Button
+        android:id="@+id/btn_delete"
+        android:text="@string/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/btn_update"/>
+
+
+
+</android.support.percent.PercentRelativeLayout>

@@ -8,4 +8,6 @@
     <dimen name="sp_18">18sp</dimen>
     <dimen name="dp_5">5dp</dimen>
     <dimen name="dp_50">50dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="dp_20">20dp</dimen>
 </resources>

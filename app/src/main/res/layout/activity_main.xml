@@ -9,22 +9,20 @@
     tools:context="com.skycaster.sotenmapper.activity.MainActivity">
 
     <Button
-        android:onClick="testGPS"
+        android:onClick="toMappingActivity"
+        android:text="@string/map"
+        android:textSize="@dimen/sp_25"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="@string/gps_module_test"/>
+        android:layout_weight="1"/>
+
     <Button
-        android:onClick="testCDRadio"
+        android:onClick="toSettingActivity"
+        android:text="@string/settting"
+        android:textSize="@dimen/sp_25"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="@string/sk9042_module_test"/>
-    <Button
-        android:onClick="combineTest"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="@string/conbine_test"/>
+        android:layout_weight="1"/>
+
 
 </LinearLayout>

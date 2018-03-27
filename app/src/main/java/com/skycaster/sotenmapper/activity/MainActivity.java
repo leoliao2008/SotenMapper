@@ -1,12 +1,19 @@
 package com.skycaster.sotenmapper.activity;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.skycaster.sotenmapper.R;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static void start(Context context) {
+        Intent starter = new Intent(context, MainActivity.class);
+        context.startActivity(starter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,15 +21,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void testGPS(View view) {
-        GPSTestActivity.start(this);
+
+    public void toSettingActivity(View view) {
+        SettingActivity.start(this);
     }
 
-    public void testCDRadio(View view) {
-        CDRadioTestActivity.start(this);
-    }
-
-    public void combineTest(View view) {
-        CombineTestActivity.start(this);
+    public void toMappingActivity(View view) {
+        MappingActivity.start(this);
     }
 }

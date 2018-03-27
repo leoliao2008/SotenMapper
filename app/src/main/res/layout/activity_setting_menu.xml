@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.skycaster.sotenmapper.activity.SettingActivity">
+    <TextView
+        android:onClick="toOffMapAdmin"
+        style="@style/MenuTextStyle"
+        android:text="@string/off_line_map"/>
+    <TextView
+        android:onClick="toGPSTest"
+        style="@style/MenuTextStyle"
+        android:text="@string/gps_module_test"/>
+    <TextView
+        android:onClick="toSk9042Test"
+        style="@style/MenuTextStyle"
+        android:text="@string/sk9042_module_test"/>
+
+</LinearLayout>

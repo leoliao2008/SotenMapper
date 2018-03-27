@@ -168,4 +168,8 @@ public abstract class RequestCallBack {
     public void getLDPC(String passCnt, String failCnt) {
 
     }
+
+    public void setLogLevel(boolean isSuccess){
+
+    }
 }

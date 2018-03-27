@@ -8,6 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
 
     <style name="AlertDialogTextTitle">
@@ -42,5 +50,34 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/sp_18</item>
     </style>
+
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="@string/off_line_map"-->
+    <!--android:textSize="@dimen/sp_20"-->
+    <!--android:padding="@dimen/dp_20"-->
+    <!--android:textColor="@color/color_gray_to_red"-->
+
+    <style name="MenuTextStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/sp_20</item>
+        <item name="android:padding">@dimen/dp_20</item>
+        <item name="android:textColor">@color/color_gray_to_red</item>
+    </style>
+
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@drawable/white_round_corner"-->
+    <!--android:layout_margin="@dimen/dp_2"-->
+    <!--android:translationZ="@dimen/dp_2"-->
+    <style name="ListViewItemStyle1">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/white_round_corner</item>
+        <item name="android:layout_margin">@dimen/dp_2</item>
+        <item name="android:translationZ">@dimen/dp_2</item>
+    </style>
+
 
 </resources>

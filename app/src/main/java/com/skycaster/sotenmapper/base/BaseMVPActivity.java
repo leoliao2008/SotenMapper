@@ -56,6 +56,12 @@ public abstract class BaseMVPActivity<T extends ImplBasePresenter> extends AppCo
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mPresenter.onPause();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         mPresenter.onStop();

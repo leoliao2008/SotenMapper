@@ -1,5 +1,9 @@
 package com.skycaster.sk9042_lib.request;
 
+import android.util.Log;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -80,9 +84,9 @@ public class RequestManager {
     }
 
     /**
-     * 设置频点。频点的设置注意以下两点：
+     * 设置频点。频点的设置注意以下三点：
      *1、在查询频点之前，如果没有手动设置频点，并且没有经过搜台，会返回NONE值。
-     *2、如果在模式1，设置频点之后会立即生效。如果在模式2和模式3，设置频点之后不能立即生效。
+     *2、只能在模式1设置频点
      *3、设置的频点数据会写入flash。
      * @param os 串口输出流
      * @param freq 频点，用ASCII字符串表示，如:9800,即设置频点为98MHz（Tuner以10KHz为单位）
@@ -111,7 +115,8 @@ public class RequestManager {
     }
 
     /**
-     * 设置接收模式
+     * 设置接收模式。用户设置接收模式后，接收模式会立即生效。但是因为算法在进行快搜时，无法及时响应AT指令，所以用户设置接收模式后，可能会表现出一些延迟。
+     * 模式信息会写flash，算法下次启动时，会从flash中读取模式信息。即算法会运行在上次用户设置的模式上。如果用户从来没有设置过接收模式，会运行在模式2。
      * @param os 串口输出流
      * @param mode 用ASCII字符串表示：2：模式2  3：模式3
      * @throws IOException 串口输出流报错
@@ -136,7 +141,7 @@ public class RequestManager {
     }
 
     /**
-     * 设置运行模式
+     * 设置运行模式。模式3为默认运行模式。
      * @param os 串口输出流
      * @param mode 用ASCII字符串表示：
      *1：模式1：采用用户设置的固定的频点，使用此模式用户必须先设置频点
@@ -351,7 +356,7 @@ public class RequestManager {
 
     /**
      * Log等级设置
-     *  @param os 串口输出流
+     * @param os 串口输出流
      * @param level 表示log等级：
      * 0：关闭一切显示
      * 1：用户信息，打印必要的交互信息以指示系统运行状态
@@ -364,8 +369,23 @@ public class RequestManager {
      * @throws NumberFormatException 当参数不符合上述规定时报错
      */
     public synchronized void setLogLevel(OutputStream os,String level) throws IOException, InputFormatException,NumberFormatException {
-        sendRequest(os, RequestType.SET_LOG_LEVEL);
+        sendRequest(os, RequestType.SET_LOG_LEVEL,level);
     }
+
+    /**
+     * 初始化SK9042系统升级
+     * @param os os 串口输出流
+     * @param srcPath 升级文件本地路径
+     * @throws IOException 串口输出流报错
+     */
+    public synchronized void sysUpgadeInit(OutputStream os,String srcPath) throws IOException {
+        try {
+            sendRequest(os,RequestType.SYS_UPGRADE_START,srcPath);
+        } catch (InputFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**
@@ -382,7 +402,6 @@ public class RequestManager {
         switch (rq){
             case TEST_CONN:
             case RESET:
-            case SYS_UPGRADE_START:
             case CHECK_FREQ:
             case CHECK_REV_MODE:
             case CHECK_RUN_MODE:
@@ -438,6 +457,13 @@ public class RequestManager {
                     throw new InputFormatException("The param is confined only to \"OPEN\" or \"CLOSE\"");
                 }
                 break;
+            case SYS_UPGRADE_START:
+                //AT+STUD:<crc>,<file_tot_len>\r\n
+                sb.append(RequestType.SYS_UPGRADE_START);
+                File src=new File((String) params[0]);
+                sb.append(getCheckCode(src)).append(",").append(src.length()).append(mAppendix);
+                showLog("System upgrade command: "+sb.toString());
+                break;
             case SYS_UPGRADE_UPLOAD_DATA:
                 //// TODO: 2018/3/16 相关协议还没出来
                 break;
@@ -460,7 +486,7 @@ public class RequestManager {
             case SET_LOG_LEVEL:
                 Integer i2 = Integer.valueOf((String) params[0]);
                 if(i2>=0&&i2<=5){
-                    buildCmdWithParam0(rq,params[0]);
+                    sb=buildCmdWithParam0(rq,params[0]);
                 }else {
                     throw new InputFormatException("Log level must be within the range of [0-5].");
                 }
@@ -468,7 +494,26 @@ public class RequestManager {
             default:
                 break;
         }
+        showLog("request send: "+sb.toString());
         os.write(sb.toString().getBytes());
+    }
+
+    private String getCheckCode(File src) throws IOException {
+        FileInputStream in=new FileInputStream(src);
+        byte code= (byte) in.read();
+        byte next;
+        while ((next= (byte) in.read())!=-1){
+            code^=next;
+        }
+        StringBuilder sb=new StringBuilder();
+        sb.append("0x");
+        String hexString = Integer.toHexString(code);
+        if(hexString.length()<2){
+            sb.append("0");
+        }
+        sb.append(hexString);
+        in.close();
+        return sb.toString();
     }
 
     /**
@@ -479,6 +524,11 @@ public class RequestManager {
      */
     private synchronized StringBuilder buildCmdWithParam0(RequestType rq, Object param) {
         return new StringBuilder().append(rq.toString()).append("=").append(param).append(mAppendix);
+    }
+
+    private void showLog(String msg){
+        Log.e(getClass().getSimpleName(),msg);
+
     }
 
 }

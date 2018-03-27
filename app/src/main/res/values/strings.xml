@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SotenMapper</string>
+    <string name="app_name">新平板定位</string>
     <string name="sp_setting">串口设置</string>
     <string name="path">路径</string>
     <string name="bd_rate">波特率</string>
@@ -17,6 +17,8 @@
     <string name="gps_module_test">GPS模块测试</string>
     <string name="sk9042_module_test">SK9042模块测试</string>
     <string name="conbine_test">联合测试</string>
+    <string name="settting">设置</string>
+    <string name="map">地图</string>
     <array name="sk9042_functions">
         <item>测试连接</item>
         <item>算法复位</item>
@@ -47,4 +49,16 @@
         <item>译码统计</item>
         <item>Log等级设置</item>
     </array>
+    <string name="title_activity_mapping">MappingActivity</string>
+    <string name="off_line_map">离线地图</string>
+    <string name="combine_test">综合测试</string>
+    <string name="test">测试</string>
+    <string name="delete">删除</string>
+    <string name="check_update">检查更新</string>
+    <string name="update">升级</string>
+    <string name="offline_map_list">离线地图下载清单</string>
+    <string name="search">搜索</string>
+    <string name="down_load">下载</string>
+    <string name="downloaded">已下载</string>
+    <string name="begin_to_download">开始下载</string>
 </resources>

@@ -2,8 +2,6 @@ package com.skycaster.sotenmapper.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +13,10 @@ import android.widget.ListView;
 import com.baidu.mapapi.map.offline.MKOLSearchRecord;
 import com.baidu.mapapi.map.offline.MKOLUpdateElement;
 import com.baidu.mapapi.map.offline.MKOfflineMap;
-import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.skycaster.sotenmapper.R;
+import com.skycaster.sotenmapper.activity.MapAdminActivity;
 import com.skycaster.sotenmapper.adapter.AvailMapListAdapter;
+import com.skycaster.sotenmapper.base.BaseFragment;
 import com.skycaster.sotenmapper.bean.MyMKOLSearchRecord;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
  * Created by 廖华凯 on 2018/3/27.
  */
 
-public class AvailMapListFragment extends Fragment {
+public class AvailMapListFragment extends BaseFragment {
     private MKOfflineMap mManager;
     private ArrayList<MyMKOLSearchRecord> mOfflineCityList=new ArrayList<>();
     private EditText mEdt_input;
@@ -36,6 +35,7 @@ public class AvailMapListFragment extends Fragment {
     private AvailMapListAdapter.CallBack mCallBack = new AvailMapListAdapter.CallBack() {
         @Override
         public void onRequestDownLoad(int cityId) {
+            showLog("start to download city id = "+cityId);
             mManager.start(cityId);
             for(MyMKOLSearchRecord temp:mOfflineCityList){
                 if(temp.cityID==cityId){
@@ -46,24 +46,26 @@ public class AvailMapListFragment extends Fragment {
             }
         }
     };
+    private MapAdminActivity mActivity;
+
+    public AvailMapListFragment(MKOfflineMap manager) {
+        mManager = manager;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mManager=new MKOfflineMap();
-        mManager.init(new MKOfflineMapListener() {
-            @Override
-            public void onGetOfflineMapState(int i, int i1) {
+//        mManager=new MKOfflineMap();
+//        mManager.init(new MKOfflineMapListener() {
+//            @Override
+//            public void onGetOfflineMapState(int i, int i1) {
+//
+//            }
+//        });
+        showLog("onCreate");
+        mActivity = (MapAdminActivity) getActivity();
+//        mManager=mActivity.getMapManager();
 
-            }
-        });
-        updateMapList(null);
-        mAdapter=new AvailMapListAdapter(
-                mOfflineCityList,
-                getContext(),
-                R.layout.item_avail_offline_map,
-                mCallBack
-        );
     }
 
     /**
@@ -71,6 +73,7 @@ public class AvailMapListFragment extends Fragment {
      * @param keyWord 根据关键字搜索并更新离线地图清单，当为空时，搜索所有离线地图
      */
     private void updateMapList(@Nullable String keyWord) {
+        showLog("updateMapList");
         mOfflineCityList.clear();
         ArrayList<MKOLSearchRecord> cityList;
         if(keyWord==null){
@@ -85,19 +88,21 @@ public class AvailMapListFragment extends Fragment {
         }else {
             cityList=mManager.searchCity(keyWord);
         }
-        Log.e(getClass().getSimpleName(),"city list size ="+cityList.size());
-        ArrayList<MKOLUpdateElement> localMaps = mManager.getAllUpdateInfo();
-        for(MKOLSearchRecord city:cityList){
-            MyMKOLSearchRecord temp = new MyMKOLSearchRecord(city);
-            if(localMaps!=null){
-                for(MKOLUpdateElement map:localMaps){
-                    if(map.cityID==temp.cityID){
-                        temp.isDownLoaded=true;
-                        break;
+        if(cityList!=null){
+            Log.e(getClass().getSimpleName(),"city list size ="+cityList.size());
+            ArrayList<MKOLUpdateElement> localMaps = mManager.getAllUpdateInfo();
+            for(MKOLSearchRecord city:cityList){
+                MyMKOLSearchRecord temp = new MyMKOLSearchRecord(city);
+                if(localMaps!=null){
+                    for(MKOLUpdateElement map:localMaps){
+                        if(map.cityID==temp.cityID){
+                            temp.isDownLoaded=true;
+                            break;
+                        }
                     }
                 }
+                mOfflineCityList.add(temp);
             }
-            mOfflineCityList.add(temp);
         }
         if(mAdapter!=null){
             mAdapter.notifyDataSetChanged();
@@ -110,18 +115,24 @@ public class AvailMapListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        showLog("onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_avail_offline_maps, null);
         mEdt_input = rootView.findViewById(R.id.edt_search_input);
         mBtn_search = rootView.findViewById(R.id.btn_search);
         mListView = rootView.findViewById(R.id.list_view);
+        mAdapter=new AvailMapListAdapter(
+                mOfflineCityList,
+                getContext(),
+                R.layout.item_avail_offline_map,
+                mCallBack
+        );
         mListView.setAdapter(mAdapter);
+        updateMapList(null);
         mBtn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String input = mEdt_input.getText().toString().trim();
-                if(!TextUtils.isEmpty(input)){
-                    updateMapList(input);
-                }
+                updateMapList(input);
             }
         });
         return rootView;
@@ -130,6 +141,5 @@ public class AvailMapListFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mManager.destroy();
     }
 }

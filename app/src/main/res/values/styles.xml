@@ -17,7 +17,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-
     <style name="AlertDialogTextTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -30,7 +29,6 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-
     <style name="AlertDialogTextContent">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -39,7 +37,6 @@
         <item name="android:layout_margin">@dimen/dp_2</item>
         <item name="android:gravity">center</item>
     </style>
-
 
     <style name="AlertDialogButton">
         <item name="android:layout_width">0dp</item>
@@ -51,13 +48,6 @@
         <item name="android:textSize">@dimen/sp_18</item>
     </style>
 
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="@string/off_line_map"-->
-    <!--android:textSize="@dimen/sp_20"-->
-    <!--android:padding="@dimen/dp_20"-->
-    <!--android:textColor="@color/color_gray_to_red"-->
-
     <style name="MenuTextStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -66,11 +56,6 @@
         <item name="android:textColor">@color/color_gray_to_red</item>
     </style>
 
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:background="@drawable/white_round_corner"-->
-    <!--android:layout_margin="@dimen/dp_2"-->
-    <!--android:translationZ="@dimen/dp_2"-->
     <style name="ListViewItemStyle1">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -78,6 +63,10 @@
         <item name="android:layout_margin">@dimen/dp_2</item>
         <item name="android:translationZ">@dimen/dp_2</item>
     </style>
+
+    <declare-styleable name="LanternView">
+        <attr name="lantern_view_textSize" format="dimension"/>
+    </declare-styleable>
 
 
 </resources>

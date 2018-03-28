@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 
+import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.skycaster.sotenmapper.R;
 import com.skycaster.sotenmapper.base.BaseMVPActivity;
 import com.skycaster.sotenmapper.presenter.MapAdminPresenter;
@@ -17,6 +18,7 @@ public class MapAdminActivity extends BaseMVPActivity<MapAdminPresenter> {
     PagerTitleStrip mPagerTitleStrip;
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
+    private MKOfflineMap mMapManager;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, MapAdminActivity.class);
@@ -49,5 +51,13 @@ public class MapAdminActivity extends BaseMVPActivity<MapAdminPresenter> {
 
     public ViewPager getViewPager() {
         return mViewPager;
+    }
+
+    public MKOfflineMap getMapManager() {
+        return mMapManager;
+    }
+
+    public void setMapManager(MKOfflineMap mapManager) {
+        mMapManager = mapManager;
     }
 }

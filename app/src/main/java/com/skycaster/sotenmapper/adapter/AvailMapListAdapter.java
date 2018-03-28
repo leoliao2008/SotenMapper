@@ -34,32 +34,19 @@ public class AvailMapListAdapter extends MyBaseAdapter<MyMKOLSearchRecord,Availa
 
     @Override
     protected void initConvertView(final MyMKOLSearchRecord bean, AvailableMapViewHolder vh, int position) {
-        if(vh==null){
-            showLog("vh == null");
-        }
-        if(vh.getTv_city()==null){
-            showLog("city == null");
-        }
-
-        if(bean==null){
-            showLog("bean == null");
-        }
-
-        if(bean.cityName==null){
-            showLog("city name ==null");
-        }
         vh.getTv_city().setText(bean.cityName);
         vh.getBtn_downLoad().setText(bean.isDownLoaded?getContext().getString(R.string.downloaded):getContext().getString(R.string.begin_to_download));
         if(bean.isDownLoaded){
             vh.getBtn_downLoad().setEnabled(false);
+        }else {
+            vh.getBtn_downLoad().setEnabled(true);
             vh.getBtn_downLoad().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    showLog("request down load city "+bean.cityName);
                     mCallBack.onRequestDownLoad(bean.cityID);
                 }
             });
-        }else {
-            vh.getBtn_downLoad().setEnabled(true);
         }
     }
 

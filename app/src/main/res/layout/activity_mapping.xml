@@ -12,4 +12,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <TextSwitcher
+        android:id="@+id/txt_switcher"
+        android:layout_width="0dp"
+        app:layout_widthPercent="70%"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_round_corner"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/dp_5"/>
+
+    <com.skycaster.sotenmapper.widget.LanternView
+        android:id="@+id/lantern_view"
+        android:layout_width="@dimen/dp_50"
+        android:layout_height="@dimen/dp_50"
+        android:layout_margin="@dimen/dp_5"/>
+
 </android.support.percent.PercentRelativeLayout>

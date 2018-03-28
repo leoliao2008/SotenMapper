@@ -19,6 +19,12 @@
     <string name="conbine_test">联合测试</string>
     <string name="settting">设置</string>
     <string name="map">地图</string>
+    <string name="invalid_fix_quality">无效</string>
+    <string name="gps_fix_quality">单点</string>
+    <string name="dgps_fix_quality">伪距</string>
+    <string name="flaot_fix_quality">浮点</string>
+    <string name="rtk_fix_quality">固定</string>
+    <string name="default_fix_quality">缺省</string>
     <array name="sk9042_functions">
         <item>测试连接</item>
         <item>算法复位</item>
@@ -61,4 +67,10 @@
     <string name="down_load">下载</string>
     <string name="downloaded">已下载</string>
     <string name="begin_to_download">开始下载</string>
+    <string name="set_freq">设置主频</string>
+    <string name="check_freq">查询主频</string>
+    <string name="sk9042_current_freq_is">SK9042当前频点是</string>
+    <string name="sk9042_freq_setting">SK9042频点设置：</string>
+    <string name="freq_param_is_not_stored_in_flash">FLASH仍未写入频点信息。</string>
+    <string name="await_module_initializing">模块启动中，请稍候......</string>
 </resources>

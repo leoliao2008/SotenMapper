@@ -18,9 +18,15 @@ import com.skycaster.sotenmapper.callbacks.AlertDialogCallBack;
 import com.skycaster.sotenmapper.impl.Static;
 import com.skycaster.sotenmapper.module.CDRadioModule;
 import com.skycaster.sotenmapper.utils.AlertDialogUtils;
+import com.skycaster.sotenmapper.utils.StreamOptimizer;
 import com.skycaster.sotenmapper.utils.ToastUtil;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+
+import project.SerialPort.SerialPort;
 
 /**
  * Created by 廖华凯 on 2018/3/22.
@@ -180,6 +186,8 @@ public class CDRadioTestPresenter extends BasePresenter {
         }
     };
     private AckDecipher mAckDecipher=new AckDecipher(mRequestCallBack);
+    private Thread mGpsRevThread;
+    private volatile boolean isGpsInterrupt;
 
     public CDRadioTestPresenter(CDRadioTestActivity activity) {
         mActivity = activity;
@@ -222,6 +230,8 @@ public class CDRadioTestPresenter extends BasePresenter {
             } catch (InterruptedException e) {
                 handleException(e);
             }
+            //测试用
+            closeGpsThread();
         }
 
     }
@@ -240,8 +250,11 @@ public class CDRadioTestPresenter extends BasePresenter {
     }
 
     public void showSpSettingWindow(){
-        String path = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH, Static.DEFAULT_CD_RADIO_SP_PATH);
-        String rate = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES, Static.DEFAULT_CD_RADIO_SP_BD_RATE);
+        //3月28日为了测试展示暂时屏蔽这些代码
+        //String path = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH, Static.DEFAULT_CD_RADIO_SP_PATH);
+        //String rate = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES, Static.DEFAULT_CD_RADIO_SP_BD_RATE);
+        String path = BaseApplication.getSharedPreferences().getString(Static.GPS_SP_PATH, Static.DEFAULT_GPS_SP_PATH);
+        String rate = BaseApplication.getSharedPreferences().getString(Static.GPS_BD_RATE, Static.DEFAULT_GPS_SP_BD_RATE);
         AlertDialogUtils.showAppSpConfigWindow(
                 mActivity,
                 path,
@@ -249,18 +262,73 @@ public class CDRadioTestPresenter extends BasePresenter {
                 new AlertDialogCallBack(){
                     @Override
                     public void onGetSpParams(String path, String bdRate) {
+
                         try {
-                            SharedPreferences.Editor edit = BaseApplication.getSharedPreferences().edit();
-                            edit.putString(Static.CD_RADIO_SP_PATH,path);
-                            edit.putString(Static.CD_RADIO_BD_RATES,bdRate);
-                            edit.apply();
-                            mCdRadioModule.openConnection(path,Integer.valueOf(bdRate),mAckDecipher);
+                            //3月28日为了测试展示暂时屏蔽这些代码
+                            //SharedPreferences.Editor edit = BaseApplication.getSharedPreferences().edit();
+                            //edit.putString(Static.CD_RADIO_SP_PATH,path);
+                            //edit.putString(Static.CD_RADIO_BD_RATES,bdRate);
+                            //edit.apply();
+                            //mCdRadioModule.openConnection(path,Integer.valueOf(bdRate),mAckDecipher);
+                            testGpsSp(path,bdRate);//测试用
                         } catch (Exception e) {
                             handleException(e);
                         }
+
                     }
                 }
         );
+    }
+
+    private void closeGpsThread(){
+        if(mGpsRevThread!=null&&mGpsRevThread.isAlive()){
+            isGpsInterrupt=true;
+            try {
+                mGpsRevThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void testGpsSp(String path, String bdRate) {
+        closeGpsThread();
+        SharedPreferences.Editor edit = BaseApplication.getSharedPreferences().edit();
+        edit.putString(Static.GPS_SP_PATH,path);
+        edit.putString(Static.GPS_BD_RATE,bdRate);
+        edit.apply();
+        try {
+            final SerialPort sp=new SerialPort(new File(path),Integer.valueOf(bdRate),0);
+            final InputStream inputStream = sp.getInputStream();
+            mGpsRevThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    byte[] temp=new byte[512];
+                    StreamOptimizer optimizer=new StreamOptimizer();
+                    optimizer.open();
+                    optimizer.addFd(sp.getParcelFileDescriptor().getFd(),1);
+                    isGpsInterrupt=false;
+                    while (!isGpsInterrupt){
+                        int available = optimizer.pollInner(300);
+                        showLog("available ="+available);
+                        if(available>0){
+                            try {
+                                int read = inputStream.read(temp);
+                                updateConsole(new String(temp));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                break;
+                            }
+                        }
+                    }
+                    optimizer.removeFd(sp.getParcelFileDescriptor().getFd());
+                    optimizer.close();
+                }
+            });
+            mGpsRevThread.start();
+        } catch (IOException e) {
+            handleException(e);
+        }
     }
 
     private void initConsole() {

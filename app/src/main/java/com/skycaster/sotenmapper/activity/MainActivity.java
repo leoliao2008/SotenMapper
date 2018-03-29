@@ -29,4 +29,8 @@ public class MainActivity extends AppCompatActivity {
     public void toMappingActivity(View view) {
         MappingActivity.start(this);
     }
+
+    public void toSatelliteActivity(View view) {
+        SatelliteActivity.start(this);
+    }
 }

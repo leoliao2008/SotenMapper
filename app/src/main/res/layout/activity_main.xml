@@ -17,6 +17,14 @@
         android:layout_weight="1"/>
 
     <Button
+        android:onClick="toSatelliteActivity"
+        android:text="@string/satellite_map"
+        android:textSize="@dimen/sp_25"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
         android:onClick="toSettingActivity"
         android:text="@string/settting"
         android:textSize="@dimen/sp_25"

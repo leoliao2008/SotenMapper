@@ -394,7 +394,7 @@ public class CDRadioTestPresenter extends BasePresenter {
                             mCdRadioModule.getBaudRate();
                             break;
                         case 5:
-                            AlertDialogUtils.showSK9042GetFreqWindow(
+                            AlertDialogUtils.showSK9042SetFreqWindow(
                                     mActivity,
                                     new AlertDialogCallBack(){
                                         @Override

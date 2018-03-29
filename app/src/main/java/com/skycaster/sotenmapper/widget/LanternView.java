@@ -14,7 +14,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.skycaster.inertial_navi_lib.GPGGA.FixQuality;
+import com.skycaster.gps_decipher_lib.GPGGA.FixQuality;
 import com.skycaster.sotenmapper.R;
 
 
@@ -107,11 +107,12 @@ public class LanternView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawCircle(width/2, mRadius, mRadius,mPaint);
-        if(!TextUtils.isEmpty(mLevel)){
-            canvas.drawText(mLevel,(width-mTextBound.width())/2,height-3,mTextPaint);
-        }else{
+        if(TextUtils.isEmpty(mLevel)){
+            //第一次绘制时会走这里，然后立刻进行第二次绘制，mLevel再也不会为空。
             updateLantern(FixQuality.QUALITY_INVALID);
+        }else{
+            canvas.drawCircle(width/2, mRadius, mRadius,mPaint);
+            canvas.drawText(mLevel,(width-mTextBound.width())/2,height-3,mTextPaint);
         }
     }
 }

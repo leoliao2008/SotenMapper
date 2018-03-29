@@ -5,4 +5,5 @@
     <color name="colorAccent">#4CACFF</color>
     <color name="textGrey">#747474</color>
     <color name="colorWhiteTransparent">#80ffffff</color>
+    <color name="darcula">#45494A</color>
 </resources>

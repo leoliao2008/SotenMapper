@@ -8,6 +8,7 @@
     tools:context="com.skycaster.sotenmapper.activity.MappingActivity">
 
     <com.baidu.mapapi.map.MapView
+        android:keepScreenOn="true"
         android:id="@+id/map_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
@@ -27,5 +28,13 @@
         android:layout_width="@dimen/dp_50"
         android:layout_height="@dimen/dp_50"
         android:layout_margin="@dimen/dp_5"/>
+
+    <ToggleButton
+        android:id="@+id/simulation_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/lantern_view"
+        android:textOff="模拟测试已终止"
+        android:textOn="模拟测试运行中"/>
 
 </android.support.percent.PercentRelativeLayout>

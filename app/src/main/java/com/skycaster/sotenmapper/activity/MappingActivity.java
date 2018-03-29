@@ -3,7 +3,9 @@ package com.skycaster.sotenmapper.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.TextSwitcher;
+import android.widget.ToggleButton;
 
 import com.baidu.mapapi.map.MapView;
 import com.skycaster.sotenmapper.R;
@@ -22,6 +24,8 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
     TextSwitcher mTxtSwitcher;
     @BindView(R.id.lantern_view)
     LanternView mLanternView;
+    @BindView(R.id.simulation_test)
+    ToggleButton mSimulationTest;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, MappingActivity.class);
@@ -45,6 +49,16 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
 
     @Override
     protected void initListener() {
+        mSimulationTest.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mPresenter.startTest();
+                }else {
+                    mPresenter.stopTest();
+                }
+            }
+        });
 
     }
 
@@ -84,5 +98,6 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
         }
         return true;
     }
+
 
 }

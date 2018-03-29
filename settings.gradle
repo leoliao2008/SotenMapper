@@ -1,1 +1,1 @@
-include ':app', ':sk9042_lib'
+include ':app', ':sk9042_lib', ':gps_decipher_lib'

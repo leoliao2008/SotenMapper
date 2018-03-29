@@ -79,7 +79,7 @@ public class AlertDialogUtils {
      * @param context 上下文背景
      * @param callback 回调
      */
-    public static void showSK9042GetFreqWindow(Context context , final AlertDialogCallBack callback) {
+    public static void showSK9042SetFreqWindow(Context context , final AlertDialogCallBack callback) {
         showInputWindow(context, InputType.TYPE_CLASS_NUMBER,callback);
     }
 

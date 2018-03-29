@@ -7,34 +7,37 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBar;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.model.LatLng;
-import com.skycaster.inertial_navi_lib.GPGGA.GPGGABean;
-import com.skycaster.inertial_navi_lib.GPGGA.TbGNGGABean;
-import com.skycaster.inertial_navi_lib.GPGSA.GPGSABean;
-import com.skycaster.inertial_navi_lib.GPGSV.GPGSVBean;
-import com.skycaster.inertial_navi_lib.NaviDataExtractor;
-import com.skycaster.inertial_navi_lib.NaviDataExtractorCallBack;
+import com.skycaster.gps_decipher_lib.GPGGA.GPGGABean;
+import com.skycaster.gps_decipher_lib.GPGGA.TbGNGGABean;
+import com.skycaster.gps_decipher_lib.GPGSA.GPGSABean;
+import com.skycaster.gps_decipher_lib.GPGSV.GPGSVBean;
+import com.skycaster.gps_decipher_lib.GPSDataExtractor;
+import com.skycaster.gps_decipher_lib.GPSDataExtractorCallBack;
 import com.skycaster.sk9042_lib.ack.AckDecipher;
 import com.skycaster.sk9042_lib.ack.RequestCallBack;
 import com.skycaster.sotenmapper.R;
 import com.skycaster.sotenmapper.activity.MappingActivity;
-import com.skycaster.sotenmapper.base.BaseApplication;
 import com.skycaster.sotenmapper.base.BasePresenter;
 import com.skycaster.sotenmapper.callbacks.AlertDialogCallBack;
-import com.skycaster.sotenmapper.impl.Static;
 import com.skycaster.sotenmapper.module.BaiduMapModule;
 import com.skycaster.sotenmapper.module.CDRadioModule;
 import com.skycaster.sotenmapper.module.GpsModule;
 import com.skycaster.sotenmapper.utils.AlertDialogUtils;
 import com.skycaster.sotenmapper.utils.ToastUtil;
+import com.skycaster.sotenmapper.widget.LanternView;
 
 import java.io.IOException;
 
@@ -48,7 +51,7 @@ public class MappingPresenter extends BasePresenter {
     private CDRadioModule mCDRadioModule;
     private GpsModule mGpsModule;
     private BaiduMapModule mMapModule;
-    private NaviDataExtractorCallBack mNaviDataExtractorCallBack = new NaviDataExtractorCallBack() {
+    private GPSDataExtractorCallBack mGPSDataExtractorCallBack = new GPSDataExtractorCallBack() {
         @Override
         public void onGetGPGSABean(GPGSABean bean) {
             super.onGetGPGSABean(bean);
@@ -57,13 +60,16 @@ public class MappingPresenter extends BasePresenter {
         @Override
         public void onGetGPGGABean(GPGGABean bean) {
             super.onGetGPGGABean(bean);
-            mTextSwitcher.setText(bean.getRawGpggaString());
-            mMapModule.updateMyLocation(new LatLng(bean.getLocation().getLatitude(),bean.getLocation().getLongitude()));
         }
-
         @Override
         public void onGetTBGNGGABean(TbGNGGABean bean) {
             super.onGetTBGNGGABean(bean);
+            //展示定位数据
+            mTextSwitcher.setText(bean.getRawString());
+            //调节灯笼颜色
+            mLanternView.updateLantern(bean.getFixQuality());
+            //跳到新坐标
+            mMapModule.updateMyLocation(new LatLng(bean.getLocation().getLatitude(),bean.getLocation().getLongitude()));
         }
 
         @Override
@@ -111,6 +117,11 @@ public class MappingPresenter extends BasePresenter {
     };
     private AckDecipher mAckDecipher;
     private TextSwitcher mTextSwitcher;
+    private LanternView mLanternView;
+    private FrameLayout.LayoutParams mLayoutParams;//txt switch子view的布局参数
+    private int mCnt;
+    private String[] mTestLines;
+    private Handler mHandler=new Handler();
 
 
     //********************************************函数区******************************************//
@@ -124,6 +135,7 @@ public class MappingPresenter extends BasePresenter {
         mMapView=mActivity.getMapView();
         mAckDecipher = new AckDecipher(mRequestCallBack);
         mMapModule=new BaiduMapModule(mActivity.getMapView().getMap());
+        mLanternView = mActivity.getLanternView();
         startCdRadio();
         startGps();
         initActionBar();
@@ -132,11 +144,17 @@ public class MappingPresenter extends BasePresenter {
 
     private void initTxtSwitcher() {
         mTextSwitcher = mActivity.getTxtSwitcher();
+        mLayoutParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         mTextSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
                 TextView tv = new TextView(mActivity);
+                tv.setLayoutParams(mLayoutParams);
                 tv.setTextColor(Color.BLACK);
+                tv.setGravity(Gravity.CENTER);
                 return tv;
             }
         });
@@ -156,7 +174,11 @@ public class MappingPresenter extends BasePresenter {
             mGpsModule.powerOn(mLocationListener, new GpsStatus.NmeaListener() {
                 @Override
                 public void onNmeaReceived(long timestamp, String nmea) {
-                    NaviDataExtractor.decipherData(nmea.getBytes(),nmea.length(), mNaviDataExtractorCallBack);
+                    try {
+                        GPSDataExtractor.decipherData(nmea.getBytes(),nmea.length(), mGPSDataExtractorCallBack);
+                    }catch (Exception e){
+                        handleException(e);
+                    }
                 }
             });
         } catch (Exception e) {
@@ -167,13 +189,13 @@ public class MappingPresenter extends BasePresenter {
     private void startCdRadio() {
         mCDRadioModule=new CDRadioModule((PowerManager) mActivity.getSystemService(Context.POWER_SERVICE));
         mCDRadioModule.powerOn();
-        String path= BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH,Static.DEFAULT_CD_RADIO_SP_PATH);
-        String bd=BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES,Static.DEFAULT_CD_RADIO_SP_BD_RATE);
-        try {
-            mCDRadioModule.openConnection(path,Integer.valueOf(bd), mAckDecipher);
-        } catch (Exception e) {
-            handleException(e);
-        }
+//        String path= BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH,Static.DEFAULT_CD_RADIO_SP_PATH);
+//        String bd=BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES,Static.DEFAULT_CD_RADIO_SP_BD_RATE);
+//        try {
+//            mCDRadioModule.openConnection(path,Integer.valueOf(bd), mAckDecipher);
+//        } catch (Exception e) {
+//            handleException(e);
+//        }
     }
 
     @Override
@@ -212,7 +234,7 @@ public class MappingPresenter extends BasePresenter {
     }
 
     public void setCdRadioFreq() {
-        AlertDialogUtils.showSK9042GetFreqWindow(
+        AlertDialogUtils.showSK9042SetFreqWindow(
                 mActivity,
                 new AlertDialogCallBack(){
                     @Override
@@ -233,5 +255,27 @@ public class MappingPresenter extends BasePresenter {
         } catch (IOException e) {
             handleException(e);
         }
+    }
+
+    private Runnable mTestRunnable =new Runnable() {
+        @Override
+        public void run() {
+            byte[] bytes = mTestLines[(mCnt++) % mTestLines.length].getBytes();
+            GPSDataExtractor.decipherData(bytes,bytes.length,mGPSDataExtractorCallBack);
+            mHandler.postDelayed(mTestRunnable,1000);
+        }
+    };
+
+
+    public void startTest(){
+        mGpsModule.powerOff();
+        mTestLines = mActivity.getResources().getStringArray(R.array.gngga_test_lines);
+        mCnt = mTestLines.length;
+        mHandler.post(mTestRunnable);
+    }
+
+    public void stopTest(){
+        mHandler.removeCallbacks(mTestRunnable);
+        startGps();
     }
 }

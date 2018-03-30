@@ -251,10 +251,13 @@ public class CDRadioTestPresenter extends BasePresenter {
 
     public void showSpSettingWindow(){
         //3月28日为了测试展示暂时屏蔽这些代码
-        //String path = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH, Static.DEFAULT_CD_RADIO_SP_PATH);
-        //String rate = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES, Static.DEFAULT_CD_RADIO_SP_BD_RATE);
-        String path = BaseApplication.getSharedPreferences().getString(Static.GPS_SP_PATH, Static.DEFAULT_GPS_SP_PATH);
-        String rate = BaseApplication.getSharedPreferences().getString(Static.GPS_BD_RATE, Static.DEFAULT_GPS_SP_BD_RATE);
+        String path = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH, Static.DEFAULT_CD_RADIO_SP_PATH);
+        String rate = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES, Static.DEFAULT_CD_RADIO_SP_BD_RATE);
+
+
+        //String path = BaseApplication.getSharedPreferences().getString(Static.GPS_SP_PATH, Static.DEFAULT_GPS_SP_PATH);
+        //String rate = BaseApplication.getSharedPreferences().getString(Static.GPS_BD_RATE, Static.DEFAULT_GPS_SP_BD_RATE);
+
         AlertDialogUtils.showAppSpConfigWindow(
                 mActivity,
                 path,
@@ -265,12 +268,13 @@ public class CDRadioTestPresenter extends BasePresenter {
 
                         try {
                             //3月28日为了测试展示暂时屏蔽这些代码
-                            //SharedPreferences.Editor edit = BaseApplication.getSharedPreferences().edit();
-                            //edit.putString(Static.CD_RADIO_SP_PATH,path);
-                            //edit.putString(Static.CD_RADIO_BD_RATES,bdRate);
-                            //edit.apply();
-                            //mCdRadioModule.openConnection(path,Integer.valueOf(bdRate),mAckDecipher);
-                            testGpsSp(path,bdRate);//测试用
+                            SharedPreferences.Editor edit = BaseApplication.getSharedPreferences().edit();
+                            edit.putString(Static.CD_RADIO_SP_PATH,path);
+                            edit.putString(Static.CD_RADIO_BD_RATES,bdRate);
+                            edit.apply();
+                            mCdRadioModule.openConnection(path,Integer.valueOf(bdRate),mAckDecipher);
+
+                            //testGpsSp(path,bdRate);//测试用
                         } catch (Exception e) {
                             handleException(e);
                         }

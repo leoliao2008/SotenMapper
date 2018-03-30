@@ -105,6 +105,7 @@ public class SatelliteMapView extends TextureView {
         }
     };
     private Paint mPaintBackGround;
+    private volatile boolean isInterrupted;
 
 
 
@@ -166,9 +167,11 @@ public class SatelliteMapView extends TextureView {
         setSurfaceTextureListener(new SurfaceTextureListener() {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                Canvas canvas = lockCanvas();
-                drawCompass(canvas);
-                unlockCanvasAndPost(canvas);
+                if(!isInterrupted){
+                    Canvas canvas = lockCanvas();
+                    drawCompass(canvas);
+                    unlockCanvasAndPost(canvas);
+                }
             }
 
             @Override
@@ -179,6 +182,7 @@ public class SatelliteMapView extends TextureView {
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                 enableCompassMode(false);
+                isInterrupted=true;
                 return false;
             }
 
@@ -206,65 +210,69 @@ public class SatelliteMapView extends TextureView {
      * @param canvas
      */
     private synchronized void drawCompass(Canvas canvas) {
-        //画灰色背景
-        canvas.drawCircle(centerX,centerY, (float) Math.sqrt(Math.pow(canvasWidth,2)+ Math.pow(canvasHeight,2)),mPaintBackGround);
-        //画外部实心圆
-        canvas.drawCircle(centerX, centerY, outerRadius, mPaintDarkBlue);
-        //画内部实心圆
-        canvas.drawCircle(centerX, centerY, innerRadius, mPaintBlue);
-        //画最外层两个实线圈圈
-        canvas.drawCircle(centerX, centerY, outerRadius, mPaintWhiteSolid);
-        canvas.drawCircle(centerX, centerY, innerRadius, mPaintWhiteSolid);
-        //画内部4个虚线圈圈
-        for(int i=1;i<5;i++){
-            canvas.drawCircle(centerX, centerY, innerRadius / 5 * i, mPaintWhiteDot);
-        }
-        //分别画24条标识角度的虚线，以圆心为终点
-        for(int i=1;i<25;i++){
-            int degree = 15 * i;
-            double lineAngle=degree* Math.PI/180;
-            float startX= (float) (centerX+ Math.cos(lineAngle)*(innerRadius));
-            float startY= (float) (centerY- Math.sin(lineAngle)*(innerRadius));
-            float stopX=centerX;
-            float stopY=centerY;
-            canvas.drawLine(startX,startY,stopX,stopY,mPaintWhiteDot);
-            //每条虚线起始位置绘制表示其度数的文字
-            String info;
-            TextPaint textPaint=mTextPaintFontSmall;
-            switch (degree){
-                case 90:
-                    info="N";
-                    textPaint=mTextPaintFontBig;
-                    break;
-                default:
-                    int temp=90-degree;
-                    if(temp<0){
-                        temp+=360;
-                    }
-                    info=temp +"°";
-                    break;
+        try {
+            //画灰色背景
+            canvas.drawCircle(centerX,centerY, (float) Math.sqrt(Math.pow(canvasWidth,2)+ Math.pow(canvasHeight,2)),mPaintBackGround);
+            //画外部实心圆
+            canvas.drawCircle(centerX, centerY, outerRadius, mPaintDarkBlue);
+            //画内部实心圆
+            canvas.drawCircle(centerX, centerY, innerRadius, mPaintBlue);
+            //画最外层两个实线圈圈
+            canvas.drawCircle(centerX, centerY, outerRadius, mPaintWhiteSolid);
+            canvas.drawCircle(centerX, centerY, innerRadius, mPaintWhiteSolid);
+            //画内部4个虚线圈圈
+            for(int i=1;i<5;i++){
+                canvas.drawCircle(centerX, centerY, innerRadius / 5 * i, mPaintWhiteDot);
             }
-            Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
-            double deviation= Math.ceil(fontMetrics.descent - fontMetrics.ascent-fontMetrics.leading*2)/2;
-            if(degree!=90){
-                startX= (float) (centerX+ Math.cos(lineAngle)*(innerRadius + mFontHeight/2-deviation));
-                startY= (float) (centerY- Math.sin(lineAngle)*(innerRadius + mFontHeight/2-deviation));
-            }else {
-                startX= (float) (centerX+ Math.cos(lineAngle)*(innerRadius + getResources().getDimension(R.dimen.dp_5)));
-                startY= (float) (centerY- Math.sin(lineAngle)*(innerRadius + getResources().getDimension(R.dimen.dp_5)));
-            }
+            //分别画24条标识角度的虚线，以圆心为终点
+            for(int i=1;i<25;i++){
+                int degree = 15 * i;
+                double lineAngle=degree* Math.PI/180;
+                float startX= (float) (centerX+ Math.cos(lineAngle)*(innerRadius));
+                float startY= (float) (centerY- Math.sin(lineAngle)*(innerRadius));
+                float stopX=centerX;
+                float stopY=centerY;
+                canvas.drawLine(startX,startY,stopX,stopY,mPaintWhiteDot);
+                //每条虚线起始位置绘制表示其度数的文字
+                String info;
+                TextPaint textPaint=mTextPaintFontSmall;
+                switch (degree){
+                    case 90:
+                        info="N";
+                        textPaint=mTextPaintFontBig;
+                        break;
+                    default:
+                        int temp=90-degree;
+                        if(temp<0){
+                            temp+=360;
+                        }
+                        info=temp +"°";
+                        break;
+                }
+                Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+                double deviation= Math.ceil(fontMetrics.descent - fontMetrics.ascent-fontMetrics.leading*2)/2;
+                if(degree!=90){
+                    startX= (float) (centerX+ Math.cos(lineAngle)*(innerRadius + mFontHeight/2-deviation));
+                    startY= (float) (centerY- Math.sin(lineAngle)*(innerRadius + mFontHeight/2-deviation));
+                }else {
+                    startX= (float) (centerX+ Math.cos(lineAngle)*(innerRadius + getResources().getDimension(R.dimen.dp_5)));
+                    startY= (float) (centerY- Math.sin(lineAngle)*(innerRadius + getResources().getDimension(R.dimen.dp_5)));
+                }
 
-            //旋转文字使其方向与园外径相切
-            canvas.save();
-            canvas.rotate(90-degree,startX,startY);
-            float textWidth = textPaint.measureText(info);
-            //设置文字起始点
-            float textStartX=startX-textWidth/2;
-            float textStartY=startY;
-            canvas.drawText(info,textStartX,textStartY,textPaint);
-            //返回默认的旋转角度
+                //旋转文字使其方向与园外径相切
+                canvas.save();
+                canvas.rotate(90-degree,startX,startY);
+                float textWidth = textPaint.measureText(info);
+                //设置文字起始点
+                float textStartX=startX-textWidth/2;
+                float textStartY=startY;
+                canvas.drawText(info,textStartX,textStartY,textPaint);
+                //返回默认的旋转角度
 //            canvas.rotate(degree-90,startX,startY);
-            canvas.restore();
+                canvas.restore();
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
     }
 

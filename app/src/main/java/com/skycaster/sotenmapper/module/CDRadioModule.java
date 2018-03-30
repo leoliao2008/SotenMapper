@@ -67,28 +67,8 @@ public class CDRadioModule {
                     optimizer.open();
                     optimizer.addFd(fd,1);
                     while (!isInterrupted){
-//                        showLog("reading from input stream...");
                         try {
-//                        if(mInputStream.available()>0){
-//                            int len = mInputStream.read(mPortData);
-//                            if(len>0){
-//                                Log.e("Port Data",new String(mPortData,0,len));
-//                                try {
-//                                    ackDecipher.decipherByBytes(mPortData,len);
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                    break;
-//                                }
-//                            }
-//                        }
-//                        try {
-//                            Thread.sleep(300);//休息300毫秒，避免频繁读取串口
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-
                             int available = optimizer.pollInner(300);
-//                            showLog("available = "+available);
                             if(available>0){
                                 int len = mInputStream.read(mPortData);
                                 if(len>0){
@@ -102,7 +82,7 @@ public class CDRadioModule {
                                 }
                             }
                         } catch (IOException e) {
-                            showLog("IOException:"+e.getMessage());
+                            showLog("openConnection error:"+e.getMessage());
                             break;
                         }
                     }
@@ -112,8 +92,6 @@ public class CDRadioModule {
                 }
             });
             mRevTread.start();
-//        mAckDecipher=ackDecipher;
-//        mAckDecipher.decipherByStream(mSerialPort.getInputStream());
         }
 
     }

@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by 廖华凯 on 2017/10/27.
+ * 天宝模块发过来的GPS定位数据，其实就是GPGGA数据
  */
 
 public class TbGNGGABean extends BaseBean {

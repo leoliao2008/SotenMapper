@@ -60,7 +60,7 @@ public class RequestManager {
      */
     public synchronized void getSysTime(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.TIME);
+            sendRequest(os, RequestType.GET_TIME);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -108,7 +108,7 @@ public class RequestManager {
      */
     public synchronized void getFreq(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.CHECK_FREQ);
+            sendRequest(os, RequestType.GET_FREQ);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -134,7 +134,7 @@ public class RequestManager {
      */
     public synchronized void getReceiveMode(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.CHECK_REV_MODE);
+            sendRequest(os, RequestType.GET_REV_MODE);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -162,7 +162,7 @@ public class RequestManager {
      */
     public synchronized void getRunningMode(OutputStream os) throws IOException {
         try {
-            sendRequest(os, RequestType.CHECK_RUN_MODE);
+            sendRequest(os, RequestType.GET_RUN_MODE);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -191,7 +191,7 @@ public class RequestManager {
      */
     public synchronized void checkIsOpenCKFO(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.CHECK_CKFO);
+            sendRequest(os, RequestType.GET_CKFO);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -220,7 +220,7 @@ public class RequestManager {
      */
     public synchronized void checkIsOpen1PPS(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.CHECK_1PPS);
+            sendRequest(os, RequestType.GET_1PPS);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -246,7 +246,7 @@ public class RequestManager {
      */
     public synchronized void getSysVersion(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.VERSION);
+            sendRequest(os, RequestType.GET_VERSION);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -270,7 +270,7 @@ public class RequestManager {
      */
     public synchronized void getChipId(OutputStream os) throws IOException {
         try {
-            sendRequest(os, RequestType.CHECK_CHIP_ID);
+            sendRequest(os, RequestType.GET_CHIP_ID);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -283,7 +283,7 @@ public class RequestManager {
      */
     public synchronized void getSNR(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.SNR);
+            sendRequest(os, RequestType.GET_SNR);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -296,7 +296,7 @@ public class RequestManager {
      */
     public synchronized void getSysState(OutputStream os) throws IOException {
         try {
-            sendRequest(os, RequestType.SYS_STATE);
+            sendRequest(os, RequestType.GET_SYS_STATE);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -309,7 +309,7 @@ public class RequestManager {
      */
     public synchronized void getSFO(OutputStream os) throws IOException {
         try {
-            sendRequest(os, RequestType.SFO);
+            sendRequest(os, RequestType.GET_SFO);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -322,7 +322,7 @@ public class RequestManager {
      */
     public synchronized void getCFO(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.CFO);
+            sendRequest(os, RequestType.GET_CFO);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -335,7 +335,7 @@ public class RequestManager {
      */
     public synchronized void getTunerState(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.TUNER);
+            sendRequest(os, RequestType.GET_TUNER);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -348,7 +348,7 @@ public class RequestManager {
      */
     public synchronized void getLDPC(OutputStream os) throws IOException{
         try {
-            sendRequest(os, RequestType.LDPC);
+            sendRequest(os, RequestType.GET_LDPC);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -402,20 +402,20 @@ public class RequestManager {
         switch (rq){
             case TEST_CONN:
             case RESET:
-            case CHECK_FREQ:
-            case CHECK_REV_MODE:
-            case CHECK_RUN_MODE:
-            case CHECK_CKFO:
-            case CHECK_1PPS:
-            case TIME:
-            case VERSION:
-            case CHECK_CHIP_ID:
-            case SNR:
-            case SYS_STATE:
-            case SFO:
-            case CFO:
-            case TUNER:
-            case LDPC:
+            case GET_FREQ:
+            case GET_REV_MODE:
+            case GET_RUN_MODE:
+            case GET_CKFO:
+            case GET_1PPS:
+            case GET_TIME:
+            case GET_VERSION:
+            case GET_CHIP_ID:
+            case GET_SNR:
+            case GET_SYS_STATE:
+            case GET_SFO:
+            case GET_CFO:
+            case GET_TUNER:
+            case GET_LDPC:
                 sb.append(rq.toString()).append(mAppendix);
                 break;
             case SET_BD_RATE:

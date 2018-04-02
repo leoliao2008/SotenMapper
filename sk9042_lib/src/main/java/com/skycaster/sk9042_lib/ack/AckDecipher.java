@@ -144,7 +144,7 @@ public class AckDecipher {
                         mCallBack.reset(false);
                     }
                     break;
-                case "TIME":
+                case "GET_TIME":
                     mCallBack.getSysTime(split[1]);
                     break;
                 case "BDRT ":
@@ -227,25 +227,25 @@ public class AckDecipher {
                         mCallBack.getChipId(split[1]);
                     }
                     break;
-                case "SNR":
+                case "GET_SNR":
                     mCallBack.getSNR(split[1]);
                     break;
                 case "STAT":
                     mCallBack.getSysState(split[1]);
                     break;
-                case "SFO":
+                case "GET_SFO":
                     mCallBack.getSFO(split[1]);
                     break;
-                case "CFO":
+                case "GET_CFO":
                     mCallBack.getCFO(split[1]);
                     break;
-                case "TUNER":
+                case "GET_TUNER":
                     String[] spl1 = split[1].split(",");
                     if(spl1.length==2){
                         mCallBack.getTunerState(spl1[0],spl1[1]);
                     }
                     break;
-                case "LDPC":
+                case "GET_LDPC":
                     String[] spl2 = split[1].split(",");
                     for(String temp:spl2){
                         showLog("XXXXXXXXXXX:"+temp);

@@ -8,6 +8,7 @@ import com.skycaster.gps_decipher_lib.base.BaseBean;
 
 /**
  * Created by 廖华凯 on 2017/6/6.
+ * 可以获取当前卫星定位坐标的一个类，详情百度搜索GPGGA
  */
 
 public class GPGGABean extends BaseBean{

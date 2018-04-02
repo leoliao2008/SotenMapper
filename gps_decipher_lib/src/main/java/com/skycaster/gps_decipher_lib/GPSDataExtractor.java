@@ -112,7 +112,7 @@ public class GPSDataExtractor {
     }
 
     private static synchronized boolean isSourceValid(String source) {
-        showLog("begin to check if source valid...");
+        //showLog("begin to check if source valid...");
         int checkSum=0;
         String[] data = source.split(Pattern.quote("*"));
         if(data.length==2){
@@ -125,7 +125,7 @@ public class GPSDataExtractor {
                 for(char c:chars){
                     checkSum^=c;
                 }
-                showLog("check sum="+ String.format("%X",checkSum)+" vs source ="+data[1].trim());
+                //showLog("check sum="+ String.format("%X",checkSum)+" vs source ="+data[1].trim());
                 return Integer.toHexString(checkSum).equalsIgnoreCase(data[1].trim());
             }
         }

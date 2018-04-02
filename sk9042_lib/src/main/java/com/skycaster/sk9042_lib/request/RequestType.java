@@ -6,9 +6,9 @@ package com.skycaster.sk9042_lib.request;
  */
 
 public enum RequestType {
-    TEST_CONN,RESET,TIME,SET_BD_RATE,SET_FREQ,CHECK_FREQ,SET_REV_MODE,CHECK_REV_MODE,SET_RUN_MODE,CHECK_RUN_MODE,SYS_UPGRADE_START,
-    SYS_UPGRADE_UPLOAD_DATA,TOGGLE_1PPS, CHECK_1PPS,TOGGLE_CKFO,CHECK_CKFO,VERSION, SET_CHIP_ID,CHECK_CHIP_ID,SNR,SYS_STATE,SFO,
-    CFO,TUNER,LDPC,SET_LOG_LEVEL;
+    TEST_CONN,RESET, GET_TIME,SET_BD_RATE,SET_FREQ, GET_FREQ,SET_REV_MODE, GET_REV_MODE,SET_RUN_MODE, GET_RUN_MODE,SYS_UPGRADE_START,
+    SYS_UPGRADE_UPLOAD_DATA,TOGGLE_1PPS, GET_1PPS,TOGGLE_CKFO, GET_CKFO, GET_VERSION, SET_CHIP_ID, GET_CHIP_ID, GET_SNR, GET_SYS_STATE, GET_SFO,
+    GET_CFO, GET_TUNER, GET_LDPC,SET_LOG_LEVEL;
 
     /**
      * 改写了每个枚举成员对应的字符串，方便拼接成指令。
@@ -21,21 +21,21 @@ public enum RequestType {
                 return "AT";
             case RESET:
                 return "AT+RESET";
-            case TIME:
+            case GET_TIME:
                 return "AT+TIME?";
             case SET_BD_RATE:
                 return "AT+BDRT";
             case SET_FREQ:
                 return "AT+FREQ";
-            case CHECK_FREQ:
+            case GET_FREQ:
                 return "AT+FREQ?";
             case SET_REV_MODE:
                 return "AT+RMODE";
-            case CHECK_REV_MODE:
+            case GET_REV_MODE:
                 return "AT+RMODE?";
             case SET_RUN_MODE:
                 return "AT+RM";
-            case CHECK_RUN_MODE:
+            case GET_RUN_MODE:
                 return "AT+RM?";
             case SYS_UPGRADE_START:
                 return "AT+STUD:";
@@ -43,29 +43,29 @@ public enum RequestType {
                 return "AT+UDDA";
             case TOGGLE_1PPS:
                 return "AT+1PPS";
-            case CHECK_1PPS:
+            case GET_1PPS:
                 return "AT+1PPS?";
             case TOGGLE_CKFO:
                 return "AT+CKFO";
-            case CHECK_CKFO:
+            case GET_CKFO:
                 return "AT+CKFO?";
-            case VERSION:
+            case GET_VERSION:
                 return "AT+SVER?";
             case SET_CHIP_ID:
                 return "AT+ID";
-            case CHECK_CHIP_ID:
+            case GET_CHIP_ID:
                 return "AT+ID?";
-            case SNR:
+            case GET_SNR:
                 return "AT+SNR?";
-            case SYS_STATE:
+            case GET_SYS_STATE:
                 return "AT+STAT?";
-            case SFO:
+            case GET_SFO:
                 return "AT+SFO?";
-            case CFO:
+            case GET_CFO:
                 return "AT+CFO?";
-            case TUNER:
+            case GET_TUNER:
                 return "AT+TUNER?";
-            case LDPC:
+            case GET_LDPC:
                 return "AT+LDPC?";
             case SET_LOG_LEVEL:
                 return "AT+LOG";

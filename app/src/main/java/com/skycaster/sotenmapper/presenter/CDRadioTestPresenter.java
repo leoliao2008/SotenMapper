@@ -44,7 +44,6 @@ public class CDRadioTestPresenter extends BasePresenter {
         public void testConnection(boolean isConnected) {
             super.testConnection(isConnected);
             updateConsole(isConnected?"模块连接正常":"模块连接失败");
-
         }
 
         @Override

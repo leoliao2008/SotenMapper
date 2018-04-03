@@ -74,6 +74,7 @@
     <string name="freq_param_is_not_stored_in_flash">FLASH仍未写入频点信息。</string>
     <string name="await_module_initializing">模块启动中，请稍候......</string>
     <string name="satellite_map">卫星图</string>
+    <string name="function_deleted">此功能已经被删除!</string>
     <array name="gngga_test_lines">
         <item>$GNGGA,061923.00,2234.22210054,N,11356.24785338,E,5,05,2.8,48.923,M,-3.475,M,0.0,0693*67</item>
         <item>$GNGGA,061924.00,2234.22226763,N,11356.24775916,E,4,05,2.8,49.498,M,-3.475,M,0.0,0693*63</item>

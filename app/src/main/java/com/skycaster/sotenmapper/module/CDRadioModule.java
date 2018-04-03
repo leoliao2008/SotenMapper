@@ -147,13 +147,13 @@ public class CDRadioModule {
         getInstance().getReceiveMode(mSerialPort.getOutputStream());
 
     }
-    public void setRunningMode(String mode) throws IOException, InputFormatException,NumberFormatException {
-        getInstance().setRunningMode(mSerialPort.getOutputStream(),mode);
-    }
-    public void getRunningMode() throws IOException {
-        getInstance().getRunningMode(mSerialPort.getOutputStream());
-
-    }
+//    public void setRunningMode(String mode) throws IOException, InputFormatException,NumberFormatException {
+//        getInstance().setRunningMode(mSerialPort.getOutputStream(),mode);
+//    }
+//    public void getRunningMode() throws IOException {
+//        getInstance().getRunningMode(mSerialPort.getOutputStream());
+//
+//    }
     public void toggleCKFO(boolean isToOpen) throws IOException {
         getInstance().toggleCKFO(mSerialPort.getOutputStream(),isToOpen);
     }

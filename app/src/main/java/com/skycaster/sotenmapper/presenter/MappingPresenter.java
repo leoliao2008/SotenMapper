@@ -66,10 +66,14 @@ public class MappingPresenter extends BasePresenter {
             super.onGetTBGNGGABean(bean);
             //展示定位数据
             mTextSwitcher.setText(bean.getRawString());
-            //调节灯笼颜色
-            mLanternView.updateLantern(bean.getFixQuality());
-            //跳到新坐标
-            mMapModule.updateMyLocation(new LatLng(bean.getLocation().getLatitude(),bean.getLocation().getLongitude()));
+            Location location = bean.getLocation();
+            //筛选出正常的坐标，防止一开始在0,0处定位
+            if(location.getLatitude()>0&&location.getLongitude()>0){
+                //调节灯笼颜色
+                mLanternView.updateLantern(bean.getFixQuality());
+                //跳到新坐标
+                mMapModule.updateMyLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+            }
         }
 
         @Override

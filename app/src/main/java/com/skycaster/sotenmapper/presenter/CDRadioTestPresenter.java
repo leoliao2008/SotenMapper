@@ -88,17 +88,17 @@ public class CDRadioTestPresenter extends BasePresenter {
             updateConsole("当前接收模式为模式"+mode);
         }
 
-        @Override
-        public void setRunningMode(boolean isSuccess) {
-            super.setRunningMode(isSuccess);
-            updateConsole(isSuccess?"设置运行模式成功":"设置运行模式失败");
-        }
-
-        @Override
-        public void getRunningMode(String mode) {
-            super.getRunningMode(mode);
-            updateConsole("当前运行模式为模式"+mode);
-        }
+//        @Override
+//        public void setRunningMode(boolean isSuccess) {
+//            super.setRunningMode(isSuccess);
+//            updateConsole(isSuccess?"设置运行模式成功":"设置运行模式失败");
+//        }
+//
+//        @Override
+//        public void getRunningMode(String mode) {
+//            super.getRunningMode(mode);
+//            updateConsole("当前运行模式为模式"+mode);
+//        }
 
         @Override
         public void toggleCKFO(boolean isSuccess) {
@@ -433,22 +433,24 @@ public class CDRadioTestPresenter extends BasePresenter {
                             mCdRadioModule.getReceiveMode();
                             break;
                         case 9:
-                            AlertDialogUtils.showSK9042SetRunningModeWindow(
-                                    mActivity,
-                                    new AlertDialogCallBack(){
-                                        @Override
-                                        public void onGetInput(String input) {
-                                            try {
-                                                mCdRadioModule.setRunningMode(input);
-                                            } catch (Exception e) {
-                                                handleException(e);
-                                            }
-                                        }
-                                    }
-                            );
+                            ToastUtil.showToast(mActivity.getString(R.string.function_deleted));
+//                            AlertDialogUtils.showSK9042SetRunningModeWindow(
+//                                    mActivity,
+//                                    new AlertDialogCallBack(){
+//                                        @Override
+//                                        public void onGetInput(String input) {
+//                                            try {
+//                                                mCdRadioModule.setRunningMode(input);
+//                                            } catch (Exception e) {
+//                                                handleException(e);
+//                                            }
+//                                        }
+//                                    }
+//                            );
                             break;
                         case 10:
-                            mCdRadioModule.getRunningMode();
+                            ToastUtil.showToast(mActivity.getString(R.string.function_deleted));
+//                            mCdRadioModule.getRunningMode();
                             break;
                         case 11:
                             isCKFOSet=!isCKFOSet;

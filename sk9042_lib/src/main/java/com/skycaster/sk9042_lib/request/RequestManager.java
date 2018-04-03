@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 专门用来向SK9042模块发送指令的管理类
@@ -14,6 +15,7 @@ public class RequestManager {
     private static volatile RequestManager requestManager;
     private String mAppendix="\r\n";
     private RequestManager(){}
+    private volatile AtomicBoolean isSearchingFreq=new AtomicBoolean(false);
 
     /**
      * 以单例模式获得该类实例
@@ -72,8 +74,9 @@ public class RequestManager {
      *1、命令格式是否正确。
      *2、串口号参数uart只接受两个值：1和2。
      *3、波特率参数只接受4个值：9600、57600，19200、115200。
+     *4、当前版本下串口号参数uart只接受1个值：2（不允许对串口1的波特率进行修改）。
      * @param os 串口输出流
-     * @param uart 用ASCII字符串表示,uart的值可以是1或者2，表示对第一路串口或第二路串口进行设置
+     * @param uart 用ASCII字符串表示,1或2
      * @param bdRate 用ASCII字符串表示，如:9600,即设置串口波特率为9600. bdRate值可以是9600、57600，19200、115200
      * @throws IOException 串口输出流报错
      * @throws NumberFormatException 当参数不符合上述规定时报错
@@ -140,33 +143,35 @@ public class RequestManager {
         }
     }
 
-    /**
-     * 设置运行模式。模式3为默认运行模式。
-     * @param os 串口输出流
-     * @param mode 用ASCII字符串表示：
-     *1：模式1：采用用户设置的固定的频点，使用此模式用户必须先设置频点
-     *2：模式2：进行自动搜台模式，并将可用的频点信息写入到flash
-     *3：模式3：采用flash中保存的频点，如果flash中没有保存频点数据，或者flash中的频点数据不能解数据，自动切换到模式2进行搜台
-     * @throws IOException 串口输出流报错
-     * @throws InputFormatException 当参数不符合上述规定时报错
-     * @throws NumberFormatException 当参数不符合上述规定时报错
-     */
-    public synchronized void setRunningMode(OutputStream os,String mode) throws IOException, InputFormatException,NumberFormatException {
-        sendRequest(os, RequestType.SET_RUN_MODE,mode);
-    }
 
-    /**
-     * 查询当前运行模式
-     * @param os 串口输出流
-     * @throws IOException 串口输出流报错
-     */
-    public synchronized void getRunningMode(OutputStream os) throws IOException {
-        try {
-            sendRequest(os, RequestType.GET_RUN_MODE);
-        } catch (InputFormatException e) {
-            e.printStackTrace();
-        }
-    }
+    //以下功能在1.4.2版被删除
+//    /**
+//     * 设置运行模式。模式3为默认运行模式。
+//     * @param os 串口输出流
+//     * @param mode 用ASCII字符串表示：
+//     *1：模式1：采用用户设置的固定的频点，使用此模式用户必须先设置频点
+//     *2：模式2：进行自动搜台模式，并将可用的频点信息写入到flash
+//     *3：模式3：采用flash中保存的频点，如果flash中没有保存频点数据，或者flash中的频点数据不能解数据，自动切换到模式2进行搜台
+//     * @throws IOException 串口输出流报错
+//     * @throws InputFormatException 当参数不符合上述规定时报错
+//     * @throws NumberFormatException 当参数不符合上述规定时报错
+//     */
+//    public synchronized void setRunningMode(OutputStream os,String mode) throws IOException, InputFormatException,NumberFormatException {
+//        sendRequest(os, RequestType.SET_RUN_MODE,mode);
+//    }
+//
+//    /**
+//     * 查询当前运行模式
+//     * @param os 串口输出流
+//     * @throws IOException 串口输出流报错
+//     */
+//    public synchronized void getRunningMode(OutputStream os) throws IOException {
+//        try {
+//            sendRequest(os, RequestType.GET_RUN_MODE);
+//        } catch (InputFormatException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 设置数据输出校验功能
@@ -387,6 +392,53 @@ public class RequestManager {
     }
 
 
+    /**
+     * 开始搜台。启动搜台后，AT指令的响应速度会受到影响。
+     * @param os os 串口输出流
+     * @throws IOException 串口输出流报错
+     */
+    public synchronized void startMatchFreq(OutputStream os) throws IOException{
+        if(!isSearchingFreq.get()){
+            try {
+                sendRequest(os,RequestType.AUTO_MATCH_FREQ);
+                isSearchingFreq.set(true);
+            } catch (InputFormatException e) {
+                e.printStackTrace();//绝对不会发生
+            }
+        }
+    }
+
+    /**
+     * 停止搜台
+     * @param os os 串口输出流
+     * @throws IOException 串口输出流报错
+     */
+    public synchronized void stopMatchFreq(OutputStream os) throws IOException{
+        if(isSearchingFreq.get()){
+            try {
+                sendRequest(os,RequestType.AUTO_MATCH_FREQ);
+                isSearchingFreq.set(false);
+            } catch (InputFormatException e) {
+                e.printStackTrace();//绝对不会发生
+            }
+        }
+    }
+
+    /**
+     * 判断该频点是否被SK9042支持
+     * @param os os串口输出流
+     * @param freq 频点值，比如说9800（代表98M）
+     * @throws IOException 串口输出流报错
+     */
+    public synchronized void verifyFreq(OutputStream os,String freq) throws IOException{
+        try {
+            sendRequest(os,RequestType.VERIFY_FREQ,freq);
+        } catch (InputFormatException e) {
+            e.printStackTrace();//绝对不会发生
+        }
+    }
+
+
 
     /**
      * 发送指令给SK9042模块的底层函数
@@ -404,7 +456,7 @@ public class RequestManager {
             case RESET:
             case GET_FREQ:
             case GET_REV_MODE:
-            case GET_RUN_MODE:
+//            case GET_RUN_MODE:
             case GET_CKFO:
             case GET_1PPS:
             case GET_TIME:
@@ -416,11 +468,12 @@ public class RequestManager {
             case GET_CFO:
             case GET_TUNER:
             case GET_LDPC:
+            case AUTO_MATCH_FREQ:
                 sb.append(rq.toString()).append(mAppendix);
                 break;
             case SET_BD_RATE:
                 Integer i3=Integer.valueOf((String)params[0]);
-                if(i3==1||i3==2){
+                if(i3==2){
                     Integer i4=Integer.valueOf((String)params[1]);
                     if(i4==9600||i4==57600||i4==19200||i4==115200){
                         sb.append(rq.toString()).append("=").append(params[0]).append(",").append(params[2]).append(mAppendix);
@@ -428,7 +481,7 @@ public class RequestManager {
                         throw new InputFormatException("Serial port baud rate is confined to 9600, 57600, 19200, 115200.");
                     }
                 }else {
-                    throw new InputFormatException("Serial port No. is confined to 1 or 2.");
+                    throw new InputFormatException("Serial port No. is confined to 2.");
                 }
                 break;
             case SET_FREQ:
@@ -475,14 +528,14 @@ public class RequestManager {
                     throw new InputFormatException("The length of the ID must be no less than 20.");
                 }
                 break;
-            case SET_RUN_MODE:
-                Integer i1=Integer.valueOf((String)params[0]);
-                if(i1>=1&&i1<=3){
-                    sb=buildCmdWithParam0(rq,params[0]);
-                }else {
-                    throw new InputFormatException("Running mode is confined only to 1, 2, or 3.");
-                }
-                break;
+//            case SET_RUN_MODE://此功能在1.4.2版被删除
+//                Integer i1=Integer.valueOf((String)params[0]);
+//                if(i1>=1&&i1<=3){
+//                    sb=buildCmdWithParam0(rq,params[0]);
+//                }else {
+//                    throw new InputFormatException("Running mode is confined only to 1, 2, or 3.");
+//                }
+//                break;
             case SET_LOG_LEVEL:
                 Integer i2 = Integer.valueOf((String) params[0]);
                 if(i2>=0&&i2<=5){
@@ -490,6 +543,10 @@ public class RequestManager {
                 }else {
                     throw new InputFormatException("Log level must be within the range of [0-5].");
                 }
+                break;
+            case VERIFY_FREQ:
+                Integer i4 = Integer.valueOf((String) params[0]);
+                sb.append(rq.toString()).append(":").append(i4).append(mAppendix);
                 break;
             default:
                 break;

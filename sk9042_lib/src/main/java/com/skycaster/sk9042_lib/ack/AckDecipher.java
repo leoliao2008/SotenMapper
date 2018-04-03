@@ -180,18 +180,19 @@ public class AckDecipher {
                         mCallBack.getReceiveMode(split[1]);
                     }
                     break;
-                case "RM":
-                    if(trim.contains("=")){
-                        if(split[1].equals("OK")){
-                            mCallBack.setRunningMode(true);
-                        }else if(split[1].equals("ERROR")){
-
-                            mCallBack.setRunningMode(false);
-                        }
-                    }else if(trim.contains(":")){
-                        mCallBack.getRunningMode(split[1]);
-                    }
-                    break;
+                //此功能在1.4.2中被删除
+//                case "RM":
+//                    if(trim.contains("=")){
+//                        if(split[1].equals("OK")){
+//                            mCallBack.setRunningMode(true);
+//                        }else if(split[1].equals("ERROR")){
+//
+//                            mCallBack.setRunningMode(false);
+//                        }
+//                    }else if(trim.contains(":")){
+//                        mCallBack.getRunningMode(split[1]);
+//                    }
+//                    break;
                 case "CKFO":
                     if(trim.contains("=")){
                         if(split[1].equals("OK")){
@@ -268,6 +269,29 @@ public class AckDecipher {
                         mCallBack.setLogLevel(true);
                     }else if(split[1].equals("ERROR")){
                         mCallBack.setLogLevel(false);
+                    }
+                    break;
+                case "SEARCH":
+                    if(split[1].equals("QUIT")){//搜台被终止
+                        mCallBack.stopSearchFreq();
+                    }else if(split[1].equals("ERROR")){//搜台完毕，但是没有找到可用频点
+                        mCallBack.startSearchFreq(false,null);
+                    }else {
+                        try {
+                            Integer temp = Integer.valueOf(split[1]);//检查一下能否转换成数字
+                            mCallBack.startSearchFreq(true,split[1]);//确定没问题后把最终结果返回
+                        }catch(NumberFormatException e){
+                            mCallBack.startSearchFreq(false,null);//如果没法转成数字，还是以没有找到可用频点的形式返回
+                        }
+                    }
+                    break;
+                case "CHECK":
+                    //+CHECK=OK\r\n
+                    //+CHECK=ERROR\r\n
+                    if(split[1].equals("OK")){
+                        mCallBack.verifyFreq(true);
+                    }else if(split[1].equals("ERROR")){
+                        mCallBack.verifyFreq(false);
                     }
                     break;
                 default:

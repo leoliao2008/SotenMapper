@@ -1,8 +1,11 @@
 package com.skycaster.sotenmapper.utils;
 
 import android.content.Context;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -14,8 +17,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.skycaster.sotenmapper.R;
+import com.skycaster.sotenmapper.adapter.BrowserAdapter;
 import com.skycaster.sotenmapper.callbacks.AlertDialogCallBack;
 import com.skycaster.sotenmapper.module.SerialPortModule;
+
+import java.io.File;
 
 /**
  * Created by 廖华凯 on 2018/3/19.
@@ -80,7 +86,7 @@ public class AlertDialogUtils {
      * @param callback 回调
      */
     public static void showSK9042SetFreqWindow(Context context , final AlertDialogCallBack callback) {
-        showInputWindow(context, InputType.TYPE_CLASS_NUMBER,callback);
+        showInputWindow(context, context.getResources().getString(R.string.please_input_freq),InputType.TYPE_CLASS_NUMBER,callback);
     }
 
     public static void showSK9042SetReceiveModeWindow(Context context,AlertDialogCallBack callBack){
@@ -94,11 +100,60 @@ public class AlertDialogUtils {
     }
 
     public static void showSK9042SetChipIdWindow(Context context, AlertDialogCallBack callBack) {
-        showInputWindow(context,InputType.TYPE_CLASS_TEXT,callBack);
+        showInputWindow(context,context.getResources().getString(R.string.please_input_chip_id),InputType.TYPE_CLASS_TEXT,callBack);
     }
 
     public static void showSK9042SetLogLevelWindow(Context context,AlertDialogCallBack callBack) {
         showSpinSelections(context,context.getString(R.string.set_log_level),new String[]{"0","1","2","3","4","5"},callBack);
+    }
+
+    /**
+     * 弹出一个窗口，输入特定的一个频率，测试Sk9042能否通过该频率接收数据
+     */
+    public static void showSK9042VerifyFreqWindow(Context context,AlertDialogCallBack callBack) {
+        showInputWindow(context,context.getResources().getString(R.string.please_input_freq),InputType.TYPE_CLASS_NUMBER,callBack);
+    }
+
+
+    /**
+     * 弹出一个窗口，点选升级文件，开始升级SK9042的系统
+     */
+    public static void showSK9042SysUpgradeWindow(Context context, final AlertDialogCallBack callBack) {
+        //views
+        View rootView=View.inflate(context,R.layout.dialog_pick_src_file,null);
+        Button btn_back=rootView.findViewById(R.id.btn_back);
+        Button btn_exit=rootView.findViewById(R.id.btn_exit);
+        TextView tv_path=rootView.findViewById(R.id.tv_path);
+        RecyclerView browser=rootView.findViewById(R.id.browser);
+        File rootFile = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        //data
+        tv_path.setText(rootFile.getAbsolutePath());
+        final BrowserAdapter adapter=new BrowserAdapter(rootFile, context, new BrowserAdapter.Listener() {
+            @Override
+            public void onFilePicked(File file) {
+                callBack.onGetFile(file);
+                alertDialog.dismiss();
+            }
+        });
+        browser.setLayoutManager(new GridLayoutManager(context,5,GridLayoutManager.VERTICAL,false));
+        browser.setAdapter(adapter);
+        //listener
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.back();
+            }
+        });
+        btn_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+        //build dialog
+        AlertDialog.Builder builder=new AlertDialog.Builder(context);
+        alertDialog=builder.setView(rootView).setCancelable(false).create();
+        alertDialog.show();
     }
 
 
@@ -159,14 +214,14 @@ public class AlertDialogUtils {
         alertDialog.show();
     }
 
-    private static void showInputWindow(Context context,int inputType,final AlertDialogCallBack callBack){
+    private static void showInputWindow(Context context,String title,int inputType,final AlertDialogCallBack callBack){
         View rootView = View.inflate(context, R.layout.dialog_get_input, null);
-        TextView title=rootView.findViewById(R.id.dialog_tv_title);
+        TextView tv_title=rootView.findViewById(R.id.dialog_tv_title);
         final EditText edt_input=rootView.findViewById(R.id.dialog_edt_input);
         edt_input.setInputType(inputType);
         Button btn_confirm=rootView.findViewById(R.id.dialog_btn_confirm);
         Button btn_cancel=rootView.findViewById(R.id.dialog_btn_cancel);
-        title.setText(R.string.please_input_freq);
+        tv_title.setText(title);
         btn_confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -6,7 +6,6 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
-import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.skycaster.sotenmapper.R;
@@ -62,27 +61,27 @@ public class BaiduMapModule {
      * 在地图上跳到指定的位置
      * @param latLng 目标坐标
      */
-//    public void updateMyLocation(LatLng latLng){
-//        latLng= getDummyCoord(latLng);
-//        MapStatus.Builder builder=new MapStatus.Builder().target(latLng).zoom(mZoom);
-//        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-//
-//        mBaiduMap.clear();
-//        mLocationMarker.position(latLng);
-//        mBaiduMap.addOverlay(mLocationMarker);
-//
-//    }
     public void updateMyLocation(LatLng latLng){
         latLng= getDummyCoord(latLng);
-        MyLocationData locData = new MyLocationData.Builder()
-                .latitude(latLng.latitude)
-                .longitude(latLng.latitude)
-                .build();
-        mBaiduMap.setMyLocationData(locData);
-        mBaiduMap.setMyLocationConfiguration(mMyLocationConfig);
-        mBuilder.target(latLng).zoom(mZoom);
-        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mBuilder.build()));
+        MapStatus.Builder builder=new MapStatus.Builder().target(latLng).zoom(mZoom);
+        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+
+        mBaiduMap.clear();
+        mLocationMarker.position(latLng);
+        mBaiduMap.addOverlay(mLocationMarker);
+
     }
+//    public void updateMyLocation(LatLng latLng){
+//        latLng= getDummyCoord(latLng);
+//        MyLocationData locData = new MyLocationData.Builder()
+//                .latitude(latLng.latitude)
+//                .longitude(latLng.latitude)
+//                .build();
+//        mBaiduMap.setMyLocationData(locData);
+//        mBaiduMap.setMyLocationConfiguration(mMyLocationConfig);
+//        mBuilder.target(latLng).zoom(mZoom);
+//        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mBuilder.build()));
+//    }
 
     /**
      * 将GPS设备采集的原始GPS坐标转换成百度坐标

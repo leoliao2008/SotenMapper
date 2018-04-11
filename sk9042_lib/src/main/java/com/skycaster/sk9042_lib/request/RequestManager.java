@@ -16,6 +16,8 @@ public class RequestManager {
     private String mAppendix="\r\n";
     private RequestManager(){}
     private volatile AtomicBoolean isSearchingFreq=new AtomicBoolean(false);
+    private File mUpgradeFile;
+    private OutputStream mOutputStream;
 
     /**
      * 以单例模式获得该类实例
@@ -74,7 +76,7 @@ public class RequestManager {
      *1、命令格式是否正确。
      *2、串口号参数uart只接受两个值：1和2。
      *3、波特率参数只接受4个值：9600、57600，19200、115200。
-     *4、当前版本下串口号参数uart只接受1个值：2（不允许对串口1的波特率进行修改）。
+     *4、当前版本下串口号参数uart只接受1个值：1（不允许对串口1的波特率进行修改）。
      * @param os 串口输出流
      * @param uart 用ASCII字符串表示,1或2
      * @param bdRate 用ASCII字符串表示，如:9600,即设置串口波特率为9600. bdRate值可以是9600、57600，19200、115200
@@ -231,18 +233,19 @@ public class RequestManager {
         }
     }
 
-    /**
-     * 启动系统升级。发送启动升级命令后，需要手动点击复位按钮，程序重启后生效
-     * @param os 串口输出流
-     * @throws IOException 串口输出流报错
-     */
-    public synchronized void beginSysUpgrade(OutputStream os) throws IOException{
-        try {
-            sendRequest(os, RequestType.SYS_UPGRADE_START);
-        } catch (InputFormatException e) {
-            e.printStackTrace();
-        }
-    }
+//    /**
+//     * 启动系统升级。
+//     * @param os 串口输出流
+//     * @param srcFile 升级文件
+//     * @throws IOException 串口输出流报错
+//     */
+//    public synchronized void beginSysUpgrade(OutputStream os,File srcFile) throws IOException{
+//        try {
+//            sendRequest(os, RequestType.SYS_UPGRADE_START);
+//        } catch (InputFormatException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 查询SK9042模块当前系统版本。
@@ -380,12 +383,15 @@ public class RequestManager {
     /**
      * 初始化SK9042系统升级
      * @param os os 串口输出流
-     * @param srcPath 升级文件本地路径
+     * @param srcFile 升级文件本地路径
      * @throws IOException 串口输出流报错
      */
-    public synchronized void sysUpgadeInit(OutputStream os,String srcPath) throws IOException {
+    public synchronized void startUpgrade(OutputStream os,File srcFile) throws IOException {
         try {
-            sendRequest(os,RequestType.SYS_UPGRADE_START,srcPath);
+            //这里提取两个参数出来，要给requestCallback升级时调用
+            mUpgradeFile =srcFile;
+            mOutputStream=os;
+            sendRequest(os,RequestType.SYS_UPGRADE_START,srcFile);
         } catch (InputFormatException e) {
             e.printStackTrace();
         }
@@ -473,15 +479,15 @@ public class RequestManager {
                 break;
             case SET_BD_RATE:
                 Integer i3=Integer.valueOf((String)params[0]);
-                if(i3==2){
+                if(i3==1){
                     Integer i4=Integer.valueOf((String)params[1]);
                     if(i4==9600||i4==57600||i4==19200||i4==115200){
-                        sb.append(rq.toString()).append("=").append(params[0]).append(",").append(params[2]).append(mAppendix);
+                        sb.append(rq.toString()).append("=").append(params[0]).append(",").append(params[1]).append(mAppendix);
                     }else {
                         throw new InputFormatException("Serial port baud rate is confined to 9600, 57600, 19200, 115200.");
                     }
                 }else {
-                    throw new InputFormatException("Serial port No. is confined to 2.");
+                    throw new InputFormatException("Serial port No. is confined to 1.");
                 }
                 break;
             case SET_FREQ:
@@ -513,12 +519,9 @@ public class RequestManager {
             case SYS_UPGRADE_START:
                 //AT+STUD:<crc>,<file_tot_len>\r\n
                 sb.append(RequestType.SYS_UPGRADE_START);
-                File src=new File((String) params[0]);
+                File src= (File) params[0];
                 sb.append(getCheckCode(src)).append(",").append(src.length()).append(mAppendix);
                 showLog("System upgrade command: "+sb.toString());
-                break;
-            case SYS_UPGRADE_UPLOAD_DATA:
-                //// TODO: 2018/3/16 相关协议还没出来
                 break;
             case SET_CHIP_ID:
                 String t1= (String) params[0];

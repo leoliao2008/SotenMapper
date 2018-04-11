@@ -7,6 +7,7 @@ import com.skycaster.sk9042_lib.Static;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 
 /**
  * Created by 廖华凯 on 2018/3/16.
@@ -115,6 +116,7 @@ public class AckDecipher {
 //        showLog(hexToString(ack,len));
         //把“+”号去掉，把后面的换行符给trim掉
         String trim = new String(ack, 0, len).substring(1, len).trim();
+        showLog("raw ack:"+new String(ack, 0, len));
         showLog("remove + and \\r\\n: "+trim);
         String[] split=null;
         if(trim.contains("=")){
@@ -126,14 +128,14 @@ public class AckDecipher {
         }else if(trim.equals("OK")){
             mCallBack.testConnection(true);
         }
-//        //测试用，正式删
-//        if(split!=null){
-//            for(String s:split){
-//                showLog("split:"+s);
-//            }
-//        }else {
-//            showLog("split == null!");
-//        }
+        //测试用，正式删
+        if(split!=null){
+            for(String s:split){
+                showLog("split:"+s);
+            }
+        }else {
+            showLog("split == null!");
+        }
 
         if(split!=null&&split.length>0){
             switch (split[0]){
@@ -147,7 +149,7 @@ public class AckDecipher {
                 case "GET_TIME":
                     mCallBack.getSysTime(split[1]);
                     break;
-                case "BDRT ":
+                case "BDRT":
                     if(split[1].equals("OK")){
                         mCallBack.setBaudRate(true);
                     }else if (split[1].equals("ERROR")){
@@ -264,13 +266,6 @@ public class AckDecipher {
                         mCallBack.setLogLevel(false);
                     }
                     break;
-                case "STUD":
-                    if(split[1].equals("OK")){
-                        mCallBack.setLogLevel(true);
-                    }else if(split[1].equals("ERROR")){
-                        mCallBack.setLogLevel(false);
-                    }
-                    break;
                 case "SEARCH":
                     if(split[1].equals("QUIT")){//搜台被终止
                         mCallBack.stopSearchFreq();
@@ -292,6 +287,34 @@ public class AckDecipher {
                         mCallBack.verifyFreq(true);
                     }else if(split[1].equals("ERROR")){
                         mCallBack.verifyFreq(false);
+                    }
+                    break;
+                case "UDRC"://已接收到升级指令
+                    if(split[1].equals("OK")){
+                        mCallBack.onConfirmUpgradeStart();
+                    }
+                    break;
+                case "UDSEND"://表示已经复位成功，用户可以开始发送bin文件
+                    if(split[1].equals("OK")){
+                        //利用反射获得private方法执行升级
+                        try {
+                            Method commenceUpgrade = RequestCallBack.class.getMethod("commenceUpgrade", new Class<?>[]{});
+                            commenceUpgrade.invoke(mCallBack, new Object(){});
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                case "STUD"://升级结果的回调
+                    if(split[1].equals("OK")){
+                        mCallBack.onUpgradeFinish(true,null);
+                    }else if(split[1].contains("ERROR")){
+                        String[] strings = split[1].split("ERROR");
+                        String errorCode="-1";
+                        if(strings.length>1){
+                            errorCode=strings[1];
+                        }
+                        mCallBack.onUpgradeFinish(false,errorCode);
                     }
                     break;
                 default:

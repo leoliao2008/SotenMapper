@@ -7,7 +7,7 @@ package com.skycaster.sk9042_lib.request;
 
 public enum RequestType {
     TEST_CONN,RESET, GET_TIME,SET_BD_RATE,SET_FREQ, GET_FREQ,SET_REV_MODE, GET_REV_MODE,SYS_UPGRADE_START,
-    SYS_UPGRADE_UPLOAD_DATA,TOGGLE_1PPS, GET_1PPS,TOGGLE_CKFO, GET_CKFO, GET_VERSION, SET_CHIP_ID, GET_CHIP_ID, GET_SNR, GET_SYS_STATE, GET_SFO,
+    TOGGLE_1PPS, GET_1PPS,TOGGLE_CKFO, GET_CKFO, GET_VERSION, SET_CHIP_ID, GET_CHIP_ID, GET_SNR, GET_SYS_STATE, GET_SFO,
     GET_CFO, GET_TUNER, GET_LDPC,SET_LOG_LEVEL, AUTO_MATCH_FREQ,VERIFY_FREQ;
 
     /**
@@ -39,8 +39,6 @@ public enum RequestType {
 //                return "AT+RM?";
             case SYS_UPGRADE_START:
                 return "AT+STUD:";
-            case SYS_UPGRADE_UPLOAD_DATA:
-                return "AT+UDDA";
             case TOGGLE_1PPS:
                 return "AT+1PPS";
             case GET_1PPS:

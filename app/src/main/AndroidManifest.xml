@@ -49,11 +49,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.CombineTestActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-        </activity>
-        <activity
             android:name=".activity.GPSTestActivity"
             android:screenOrientation="portrait">
         </activity>

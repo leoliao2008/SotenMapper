@@ -1,5 +1,14 @@
 package com.skycaster.sk9042_lib.ack;
 
+import android.os.Handler;
+
+import com.skycaster.sk9042_lib.request.RequestManager;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+
 /**
  * Created by 廖华凯 on 2018/3/16.
  * 发送指令给SK9042后，监听返回结果的回调。
@@ -10,29 +19,29 @@ public abstract class RequestCallBack {
      * 返回SK9042当前是否已经连接上，只有连接成功了才会有回调。
      * @param isConnected true 连接成功
      */
-    public void testConnection(boolean isConnected){}
+    protected void testConnection(boolean isConnected){}
 
     /**
      * SK9042复位请求的回调
      * @param isSuccess 复位成功/失败
      */
-    public void reset(boolean isSuccess){}
+    protected void reset(boolean isSuccess){}
 
     /**
      * 获取系统时间的回调
      * @param time 用ASCII字符串表示；如:2017,03,05,14,10,05表示2017年3月5日14点10分5秒
      */
-    public void getSysTime(String time){}
+    protected void getSysTime(String time){}
 
     /**
      * 设置波特率的回调
      * @param isSuccess 设置成功/失败
      */
-    public void setBaudRate(boolean isSuccess) {
+    protected void setBaudRate(boolean isSuccess) {
 
     }
 
-    public void setFreq(boolean isSuccess) {
+    protected void setFreq(boolean isSuccess) {
         
     }
 
@@ -41,11 +50,11 @@ public abstract class RequestCallBack {
      * @param isAvailable  true 表示有数据，false表示FLASH没有写入频点信息
      * @param freq 一个可以转成int类型的字符串，如:“9800”,即频点为98MHz（Tuner以10KHz为单位）
      */
-    public void getFreq(boolean isAvailable, String freq) {
+    protected void getFreq(boolean isAvailable, String freq) {
 
     }
 
-    public void setReceiveMode(boolean isSuccess) {
+    protected void setReceiveMode(boolean isSuccess) {
 
     }
 
@@ -53,7 +62,7 @@ public abstract class RequestCallBack {
      * 获取接收模式的回调
      * @param mode 用ASCII字符串表示：2：模式2 3：模式3
      */
-    public void getReceiveMode(String mode) {
+    protected void getReceiveMode(String mode) {
 
     }
 
@@ -73,7 +82,7 @@ public abstract class RequestCallBack {
 //
 //    }
 
-    public void toggleCKFO(boolean isSuccess) {
+    protected void toggleCKFO(boolean isSuccess) {
 
     }
 
@@ -81,11 +90,11 @@ public abstract class RequestCallBack {
      *
      * @param isOpen 用ASCII字符串表示；ENABLE：使能。校验失败不输出。DISABLE：禁止。不校验输出。
      */
-    public void checkIsOpenCKFO(String isOpen) {
+    protected void checkIsOpenCKFO(String isOpen) {
 
     }
 
-    public void toggle1PPS(boolean isSuccess) {
+    protected void toggle1PPS(boolean isSuccess) {
 
     }
 
@@ -93,7 +102,7 @@ public abstract class RequestCallBack {
      *
      * @param isOpen 用ASCII字符串表示；OPEN： 1PPS开启 CLOSE： 1PPS关闭
      */
-    public void checkIsOpen1PPS(String isOpen) {
+    protected void checkIsOpen1PPS(String isOpen) {
 
     }
 
@@ -101,11 +110,11 @@ public abstract class RequestCallBack {
      *
      * @param version 用ASCII字符串表示，如:ver1.0
      */
-    public void getSysVersion(String version) {
+    protected void getSysVersion(String version) {
 
     }
 
-    public void setChipId(boolean isSuccess) {
+    protected void setChipId(boolean isSuccess) {
 
     }
 
@@ -113,7 +122,7 @@ public abstract class RequestCallBack {
      *
      * @param id 用ASCII字符串表示，最大长度不超过20。如:123
      */
-    public void getChipId(String id) {
+    protected void getChipId(String id) {
 
     }
 
@@ -121,7 +130,7 @@ public abstract class RequestCallBack {
      *
      * @param snr 用ASCII字符串表示，如:27.10
      */
-    public void getSNR(String snr){}
+    protected void getSNR(String snr){}
 
     /**
      *
@@ -131,7 +140,7 @@ public abstract class RequestCallBack {
      * 2：锁定
      * 3：停止工作
      */
-    public void getSysState(String state) {
+    protected void getSysState(String state) {
 
     }
 
@@ -139,7 +148,7 @@ public abstract class RequestCallBack {
      *
      * @param sfo 用ASCII字符串表示，如:27.10
      */
-    public void getSFO(String sfo) {
+    protected void getSFO(String sfo) {
 
     }
 
@@ -147,7 +156,7 @@ public abstract class RequestCallBack {
      *
      * @param cfo 用ASCII字符串表示，如:27.10
      */
-    public void getCFO(String cfo) {
+    protected void getCFO(String cfo) {
 
     }
 
@@ -157,7 +166,7 @@ public abstract class RequestCallBack {
      * @param isSet Tuner设置状态。用ASCII字符串表示：0：设置失败 1：设置成功
      * @param hasData Tuner数据状态。用ASCII字符串表示：0：无数据输入 1：有数据输入
      */
-    public void getTunerState(String isSet, String hasData) {
+    protected void getTunerState(String isSet, String hasData) {
 
     }
 
@@ -166,25 +175,25 @@ public abstract class RequestCallBack {
      * @param passCnt 表示译码成功次数，无符号32位。用ASCII字符串表示，如:10,表示译码成功次数为10次。
      * @param failCnt 表示译码失败次数，无符号32位。用ASCII字符串表示，如:10,表示译码失败次数为10次。
      */
-    public void getLDPC(String passCnt, String failCnt) {
+    protected void getLDPC(String passCnt, String failCnt) {
 
     }
 
-    public void setLogLevel(boolean isSuccess){
+    protected void setLogLevel(boolean isSuccess){
 
     }
 
     /**
      * 停止搜台的回调
      */
-    public void stopSearchFreq(){}
+    protected void stopSearchFreq(){}
 
     /**
      * 开始搜台的回调
      * @param isFound 是否找到了合适的频点
      * @param result 搜索结果，以字符串表示，如“9800”
      */
-    public void startSearchFreq(boolean isFound, String result) {
+    protected void startSearchFreq(boolean isFound, String result) {
 
     }
 
@@ -192,7 +201,91 @@ public abstract class RequestCallBack {
      * 判断特定频点下SK9042是否有信号
      * @param hasSignal
      */
-    public void verifyFreq(boolean hasSignal) {
+    protected void verifyFreq(boolean hasSignal) {
+
+    }
+
+    /**
+     * 发送升级指令后，sk9042返回的表示指令参数无误，接下来将开始复位的回调，
+     * 在本回调中，客户端一般不用进行任何操作。
+     */
+    protected void onConfirmUpgradeStart() {
+
+    }
+
+    /**
+     * 通过发送升级文件，升级sk9042系统
+     */
+    private void commenceUpgrade() {
+        //在子线程中完成
+        final Handler handler=new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file= null;
+                OutputStream os=null;
+                try {
+                    //利用反射获得升级文件和输出流
+                    Field f1 = RequestManager.class.getField("mUpgradeFile");
+                    file= (File) f1.get(RequestManager.getInstance());
+                    Field f2 = RequestManager.class.getField("mOutputStream");
+                    os= (OutputStream) f2.get(RequestManager.getInstance());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(file==null||os==null){
+                    return;
+                }
+                byte[] temp=new byte[128];
+                int read=-1;
+                try {
+                    FileInputStream inputStream=new FileInputStream(file);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onStartTransferringUpgradeFile();
+                        }
+                    });
+                    while ((read=inputStream.read(temp))>0){
+                        os.write(temp,0,read);
+                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onFinishTransferringUpgradeFile();
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 开始发送升级文件的回调
+     */
+    protected void onStartTransferringUpgradeFile() {
+
+    }
+
+    /**
+     * 升级文件发送完毕的回调
+     */
+    protected void onFinishTransferringUpgradeFile() {
+
+    }
+
+
+    /**
+     * sk9042系统升级结果的回调
+     * @param isSuccess 是否升级成功
+     * @param errorCode 错误码，只有在升级失败的情况下才有意义，否则为-1。
+     *1：表示升级超时
+     *2：表示bin文件校验失败
+     *注：无论出现何种错误，固件都会还原到之前的版本
+     */
+    protected void onUpgradeFinish(boolean isSuccess, String errorCode) {
 
     }
 }

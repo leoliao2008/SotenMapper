@@ -1,5 +1,7 @@
 package com.skycaster.sotenmapper.callbacks;
 
+import java.io.File;
+
 /**
  * AlertDialogUtils的专用回调
  */
@@ -15,4 +17,6 @@ public class AlertDialogCallBack {
     public void onGetInput(String input) {
 
     }
+
+    public void onGetFile(File file){}
 }

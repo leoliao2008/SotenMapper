@@ -9,6 +9,7 @@ import com.skycaster.sotenmapper.utils.StreamOptimizer;
 import com.soten.libs.utils.LogUtils;
 import com.soten.libs.utils.PowerManagerUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,7 +19,7 @@ import static com.skycaster.sk9042_lib.request.RequestManager.getInstance;
 
 /**
  * Created by 廖华凯 on 2018/3/17.
- * 用来控制CDRadio模块（如：SK9042属于CDRadio模块）的一个类
+ * 用来控制SK9042模块类
  */
 
 public class CDRadioModule {
@@ -57,18 +58,22 @@ public class CDRadioModule {
         closeConnection();
         mSerialPort=mSerialPortModule.openSerialPort(path,bdRate);
         if(mSerialPort!=null){
+//            showLog("sp != null! begin to read sp......");
             mRevTread = new Thread(new Runnable() {
                 @Override
                 public void run() {
+//                    showLog("thread starts...");
                     isInterrupted=false;
                     mInputStream = mSerialPort.getInputStream();
                     int fd = mSerialPort.getParcelFileDescriptor().getFd();
                     StreamOptimizer optimizer = new StreamOptimizer();
                     optimizer.open();
                     optimizer.addFd(fd,1);
+//                    showLog("isInterrupted = "+isInterrupted);
                     while (!isInterrupted){
                         try {
                             int available = optimizer.pollInner(300);
+//                            showLog("estimated data len ="+available);
                             if(available>0){
                                 int len = mInputStream.read(mPortData);
                                 if(len>0){
@@ -89,15 +94,19 @@ public class CDRadioModule {
                     optimizer.removeFd(fd);
                     optimizer.close();
                     optimizer=null;
+//                    showLog("thread stops...");
                 }
             });
             mRevTread.start();
+        }else {
+            showLog("sp == null! Unable to read sp!");
         }
 
     }
 
 
     public void closeConnection() throws InterruptedException {
+//        showLog("closeConnection  -start");
         if(mRevTread!=null&&mRevTread.isAlive()){
             isInterrupted=true;
             mRevTread.join();
@@ -109,6 +118,7 @@ public class CDRadioModule {
             mSerialPortModule.close(mSerialPort);
             mSerialPort=null;
         }
+//        showLog("closeConnection  -complete");
 
     }
 
@@ -168,8 +178,9 @@ public class CDRadioModule {
     public void checkIsOpen1PPS() throws IOException {
         getInstance().checkIsOpen1PPS(mSerialPort.getOutputStream());
     }
-    public void beginSysUpgrade() throws IOException {
-        getInstance().beginSysUpgrade(mSerialPort.getOutputStream());
+    public void beginSysUpgrade(File srcFile) throws IOException {
+//        getInstance().beginSysUpgrade(mSerialPort.getOutputStream());
+        getInstance().startUpgrade(mSerialPort.getOutputStream(),srcFile);
     }
     public void getSysVersion() throws IOException {
         getInstance().getSysVersion(mSerialPort.getOutputStream());
@@ -216,4 +227,15 @@ public class CDRadioModule {
         LogUtils.e(getClass().getSimpleName(),msg);
     }
 
+    public void searchFreq() throws IOException {
+        getInstance().startMatchFreq(mSerialPort.getOutputStream());
+    }
+
+    public void stopSearchFreq() throws IOException {
+        getInstance().stopMatchFreq(mSerialPort.getOutputStream());
+    }
+
+    public void verifyFreq(String freq) throws IOException {
+        getInstance().verifyFreq(mSerialPort.getOutputStream(),freq);
+    }
 }

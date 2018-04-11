@@ -183,6 +183,69 @@ public class CDRadioTestPresenter extends BasePresenter {
             super.setLogLevel(isSuccess);
             updateConsole("Log等级设置："+isSuccess);
         }
+
+        @Override
+        public void startSearchFreq(boolean isFound, String result) {
+            super.startSearchFreq(isFound, result);
+            if(isFound){
+                updateConsole("搜台成功，匹配频率："+result);
+            }else {
+                updateConsole("搜台失败，找不到匹配频率。");
+            }
+        }
+
+        @Override
+        public void stopSearchFreq() {
+            super.stopSearchFreq();
+            updateConsole("搜台已经停止。");
+        }
+
+        @Override
+        public void verifyFreq(boolean hasSignal) {
+            super.verifyFreq(hasSignal);
+            updateConsole("该频率是否适合接收："+hasSignal);
+        }
+
+        //升级四部曲，第一步：确认进入升级模式
+        @Override
+        public void onConfirmUpgradeStart() {
+            super.onConfirmUpgradeStart();
+            updateConsole("确认可以升级，开始进入升级模式。");
+        }
+
+        //升级四部曲，第二步：开始发送升级文件，以二进制形式发送
+        @Override
+        public void onStartTransferringUpgradeFile() {
+            super.onStartTransferringUpgradeFile();
+            updateConsole("开始发送升级文件。");
+        }
+
+        //升级四部曲，第三步：升级文件发送完毕
+        @Override
+        protected void onFinishTransferringUpgradeFile() {
+            super.onFinishTransferringUpgradeFile();
+            updateConsole("升级文件已经全部发送完毕。");
+        }
+
+        //升级四部曲，第四步：SK9042升级完成，随即重启
+        @Override
+        public void onUpgradeFinish(boolean isSuccess, String errorCode) {
+            super.onUpgradeFinish(isSuccess, errorCode);
+            if(isSuccess){
+                updateConsole("升级成功！");
+            }else {
+                String error="null";
+                switch (errorCode){
+                    case "1":
+                        error="升级超时";
+                        break;
+                    case "2":
+                        error="bin文件校验失败";
+                        break;
+                }
+                updateConsole("升级失败，原因："+error);
+            }
+        }
     };
     private AckDecipher mAckDecipher=new AckDecipher(mRequestCallBack);
     private Thread mGpsRevThread;
@@ -271,6 +334,7 @@ public class CDRadioTestPresenter extends BasePresenter {
                             edit.putString(Static.CD_RADIO_SP_PATH,path);
                             edit.putString(Static.CD_RADIO_BD_RATES,bdRate);
                             edit.apply();
+                            showLog("begin to connect sp! path ="+path+", bd rate= "+bdRate);
                             mCdRadioModule.openConnection(path,Integer.valueOf(bdRate),mAckDecipher);
 
                             //testGpsSp(path,bdRate);//测试用
@@ -471,11 +535,24 @@ public class CDRadioTestPresenter extends BasePresenter {
                         case 15:
                             mCdRadioModule.checkIsOpen1PPS();
                             break;
-                        case 16:
-                            mCdRadioModule.beginSysUpgrade();
+                        case 16://系统升级
+                            AlertDialogUtils.showSK9042SysUpgradeWindow(
+                                    mActivity,
+                                    new AlertDialogCallBack(){
+                                        @Override
+                                        public void onGetFile(File file) {
+                                            super.onGetFile(file);
+                                            try {
+                                                mCdRadioModule.beginSysUpgrade(file);
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                            );
                             break;
-                        case 17:
-                            ToastUtil.showToast(mActivity.getString(R.string.function_not_available));
+                        case 17://启动升级数据传输
+                            ToastUtil.showToast("此功能已经取消，变为自动传输升级数据。");
                             break;
                         case 18:
                             mCdRadioModule.getSysVersion();
@@ -527,6 +604,27 @@ public class CDRadioTestPresenter extends BasePresenter {
                                     }
                                 }
                             });
+                            break;
+                        case 28://开始搜台
+                            mCdRadioModule.searchFreq();
+                            break;
+                        case 29://停止搜台
+                            mCdRadioModule.stopSearchFreq();
+                            break;
+                        case 30://校验频率
+                            AlertDialogUtils.showSK9042VerifyFreqWindow(
+                                    mActivity,
+                                    new AlertDialogCallBack(){
+                                        @Override
+                                        public void onGetInput(String input) {
+                                            try {
+                                                mCdRadioModule.verifyFreq(input);
+                                            } catch (IOException e) {
+                                                handleException(e);
+                                            }
+                                        }
+                                    }
+                            );
                             break;
                         default:
                             break;

@@ -26,34 +26,37 @@
     <string name="rtk_fix_quality">固定</string>
     <string name="default_fix_quality">缺省</string>
     <array name="sk9042_functions">
-        <item>测试连接</item>
-        <item>算法复位</item>
-        <item>日期时间</item>
-        <item>设置波特率</item>
-        <item>查询波特率</item>
-        <item>设置频点</item>
-        <item>查询频点</item>
-        <item>设置接收模式</item>
-        <item>查询接收模式</item>
-        <item>设置运行模式</item>
-        <item>查询运行模式</item>
-        <item>设置数据输出校验功能</item>
-        <item>查询数据输出校验功能</item>
-        <item>设置1PPS开</item>
-        <item>设置1PPS关</item>
-        <item>查询1PPS开关</item>
-        <item>启动升级</item>
-        <item>启动升级数据传输</item>
-        <item>查询软件版本</item>
-        <item>设置产品ID</item>
-        <item>查询产品ID</item>
-        <item>查询信噪比</item>
-        <item>查询接收状态</item>
-        <item>查询时偏</item>
-        <item>查询频偏</item>
-        <item>查询Tuner状态</item>
-        <item>译码统计</item>
-        <item>Log等级设置</item>
+        <item>测试连接</item>//0
+        <item>算法复位</item>//1
+        <item>日期时间</item>//2
+        <item>设置波特率</item>//3
+        <item>查询波特率</item>//4
+        <item>设置频点</item>//5
+        <item>查询频点</item>//6
+        <item>设置接收模式</item>//7
+        <item>查询接收模式</item>//8
+        <item>设置运行模式</item>//9
+        <item>查询运行模式</item>//10
+        <item>设置数据输出校验功能</item>//11
+        <item>查询数据输出校验功能</item>//12
+        <item>设置1PPS开</item>//13
+        <item>设置1PPS关</item>//14
+        <item>查询1PPS开关</item>//15
+        <item>启动升级</item>//16
+        <item>启动升级数据传输</item>//17
+        <item>查询软件版本</item>//18
+        <item>设置产品ID</item>//19
+        <item>查询产品ID</item>//20
+        <item>查询信噪比</item>//21
+        <item>查询接收状态</item>//22
+        <item>查询时偏</item>//23
+        <item>查询频偏</item>//24
+        <item>查询Tuner状态</item>//25
+        <item>译码统计</item>//26
+        <item>Log等级设置</item>//27
+        <item>开始搜台</item>//28
+        <item>停止搜台</item>//29
+        <item>校验频率</item>//30
     </array>
     <string name="title_activity_mapping">MappingActivity</string>
     <string name="off_line_map">离线地图</string>
@@ -75,6 +78,10 @@
     <string name="await_module_initializing">模块启动中，请稍候......</string>
     <string name="satellite_map">卫星图</string>
     <string name="function_deleted">此功能已经被删除!</string>
+    <string name="please_input_chip_id">请输入芯片编号</string>
+    <string name="pick_src_file">请点选文件</string>
+    <string name="return_previous">返回上一层</string>
+    <string name="exit">退出</string>
     <array name="gngga_test_lines">
         <item>$GNGGA,061923.00,2234.22210054,N,11356.24785338,E,5,05,2.8,48.923,M,-3.475,M,0.0,0693*67</item>
         <item>$GNGGA,061924.00,2234.22226763,N,11356.24775916,E,4,05,2.8,49.498,M,-3.475,M,0.0,0693*63</item>

@@ -16,6 +16,7 @@ import butterknife.BindView;
 
 /**
  * Created by 廖华凯 on 2018/3/22.
+ *
  */
 
 public class CDRadioTestActivity extends BaseMVPActivity<CDRadioTestPresenter> {

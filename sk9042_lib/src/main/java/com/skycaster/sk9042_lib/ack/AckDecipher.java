@@ -154,6 +154,13 @@ public class AckDecipher {
                         mCallBack.setBaudRate(true);
                     }else if (split[1].equals("ERROR")){
                         mCallBack.setBaudRate(false);
+                    }else {
+                        try {
+                            int i=Integer.valueOf(split[1]);//先测试能否转成整数
+                            mCallBack.getBaudRate(true,split[1]);
+                        }catch (NumberFormatException e){
+                            mCallBack.getBaudRate(false,split[1]);
+                        }
                     }
                     break;
                 case "FREQ":

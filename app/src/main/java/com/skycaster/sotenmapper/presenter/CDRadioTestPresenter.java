@@ -65,6 +65,15 @@ public class CDRadioTestPresenter extends BasePresenter {
         }
 
         @Override
+        public void getBaudRate(boolean isValid, String result) {
+            if(isValid){
+                updateConsole("SK9042差分数据输出端波特率为："+result);
+            }else {
+                updateConsole("SK9042差分数据输出端波特率获取失败，结果："+result);
+            }
+        }
+
+        @Override
         public void setFreq(boolean isSuccess) {
             super.setFreq(isSuccess);
             updateConsole(isSuccess?"频点设置成功":"频点设置失败");
@@ -289,7 +298,7 @@ public class CDRadioTestPresenter extends BasePresenter {
         if(mActivity.isFinishing()){
             try {
                 mCdRadioModule.closeConnection();
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 handleException(e);
             }
             //测试用
@@ -447,9 +456,9 @@ public class CDRadioTestPresenter extends BasePresenter {
                                     mActivity,
                                     new AlertDialogCallBack() {
                                         @Override
-                                        public void onGetSpParams(String path, String bdRate) {
+                                        public void onGetInput(String input) {
                                             try {
-                                                mCdRadioModule.setBaudRate(path,bdRate);
+                                                mCdRadioModule.setBaudRate(input);
                                             } catch (Exception e) {
                                                 handleException(e);
                                             }
@@ -544,7 +553,7 @@ public class CDRadioTestPresenter extends BasePresenter {
                                             super.onGetFile(file);
                                             try {
                                                 mCdRadioModule.beginSysUpgrade(file);
-                                            } catch (IOException e) {
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
                                         }
@@ -619,7 +628,7 @@ public class CDRadioTestPresenter extends BasePresenter {
                                         public void onGetInput(String input) {
                                             try {
                                                 mCdRadioModule.verifyFreq(input);
-                                            } catch (IOException e) {
+                                            } catch (Exception e) {
                                                 handleException(e);
                                             }
                                         }

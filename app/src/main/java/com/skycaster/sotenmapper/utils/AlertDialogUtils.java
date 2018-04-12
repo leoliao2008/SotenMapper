@@ -23,6 +23,8 @@ import com.skycaster.sotenmapper.module.SerialPortModule;
 
 import java.io.File;
 
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+
 /**
  * Created by 廖华凯 on 2018/3/19.
  */
@@ -55,19 +57,16 @@ public class AlertDialogUtils {
     }
 
     /**
-     * 弹出一个设置SK9042端的串口路径和波特率的窗口
+     * 弹出一个设置SK9042差分数据输出端的波特率的窗口
      * @param context 上下文背景
      * @param callBack 回调
      */
     public static void showSK9042SpConfigWindow(Context context,final AlertDialogCallBack callBack) {
-        showSpSettingWindow(
+        showSpinSelections(
                 context,
-                null,
-                new String[]{"1","2"},
-                null,
+                context.getResources().getString(R.string.please_select_bd_rate),
                 new String[]{"9600","57600","19200","115200"},
-                callBack
-        );
+                callBack);
     }
 
     /**
@@ -123,19 +122,23 @@ public class AlertDialogUtils {
         View rootView=View.inflate(context,R.layout.dialog_pick_src_file,null);
         Button btn_back=rootView.findViewById(R.id.btn_back);
         Button btn_exit=rootView.findViewById(R.id.btn_exit);
-        TextView tv_path=rootView.findViewById(R.id.tv_path);
+        final TextView tv_path=rootView.findViewById(R.id.tv_path);
         RecyclerView browser=rootView.findViewById(R.id.browser);
-        File rootFile = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        final File rootFile = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS);
         //data
-        tv_path.setText(rootFile.getAbsolutePath());
         final BrowserAdapter adapter=new BrowserAdapter(rootFile, context, new BrowserAdapter.Listener() {
             @Override
             public void onFilePicked(File file) {
                 callBack.onGetFile(file);
                 alertDialog.dismiss();
             }
+
+            @Override
+            public void onDirChange(File newDir) {
+                tv_path.setText(newDir.getAbsolutePath());
+            }
         });
-        browser.setLayoutManager(new GridLayoutManager(context,5,GridLayoutManager.VERTICAL,false));
+        browser.setLayoutManager(new GridLayoutManager(context,10,GridLayoutManager.VERTICAL,false));
         browser.setAdapter(adapter);
         //listener
         btn_back.setOnClickListener(new View.OnClickListener() {

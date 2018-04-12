@@ -4,7 +4,6 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import com.skycaster.sk9042_lib.ack.AckDecipher;
-import com.skycaster.sk9042_lib.request.InputFormatException;
 import com.skycaster.sotenmapper.utils.StreamOptimizer;
 import com.soten.libs.utils.LogUtils;
 import com.soten.libs.utils.PowerManagerUtils;
@@ -54,7 +53,7 @@ public class CDRadioModule {
     }
 
 
-    public void openConnection(String path, int bdRate, final AckDecipher ackDecipher) throws IOException, SecurityException, InterruptedException {
+    public void openConnection(String path, int bdRate, final AckDecipher ackDecipher) throws Exception{
         closeConnection();
         mSerialPort=mSerialPortModule.openSerialPort(path,bdRate);
         if(mSerialPort!=null){
@@ -105,7 +104,7 @@ public class CDRadioModule {
     }
 
 
-    public void closeConnection() throws InterruptedException {
+    public void closeConnection() throws Exception {
 //        showLog("closeConnection  -start");
         if(mRevTread!=null&&mRevTread.isAlive()){
             isInterrupted=true;
@@ -122,38 +121,37 @@ public class CDRadioModule {
 
     }
 
-    public void testConnection() throws IOException {
+    public void testConnection() throws Exception {
         getInstance().testConnection(mSerialPort.getOutputStream());
     }
-    public void reset() throws IOException {
+    public void reset() throws Exception {
         getInstance().reset(mSerialPort.getOutputStream());
     }
-    public void getSysTime() throws IOException {
+    public void getSysTime() throws Exception {
         getInstance().getSysTime(mSerialPort.getOutputStream());
     }
-    public void setBaudRate(String uart,String bdRate) throws IOException, InputFormatException,NumberFormatException {
+    public void setBaudRate(String bdRate) throws Exception {
         getInstance().setBaudRate(
                 mSerialPort.getOutputStream(),
-                uart,
                 bdRate
         );
 
     }
     public void getBaudRate() throws Exception {
-        throw new Exception("此功能未开通！");
+        getInstance().getBaudRate(mSerialPort.getOutputStream());
     }
-    public void setFreq(String freq) throws IOException,NumberFormatException {
+    public void setFreq(String freq) throws Exception{
         getInstance().setFreq(mSerialPort.getOutputStream(),freq);
     }
-    public void getFreq() throws IOException {
+    public void getFreq() throws Exception {
         getInstance().getFreq(mSerialPort.getOutputStream());
 
     }
-    public void setReceiveMode(String mode) throws IOException, InputFormatException,NumberFormatException {
+    public void setReceiveMode(String mode) throws Exception{
         getInstance().setReceiveMode(mSerialPort.getOutputStream(),mode);
 
     }
-    public void getReceiveMode() throws IOException {
+    public void getReceiveMode() throws Exception {
         getInstance().getReceiveMode(mSerialPort.getOutputStream());
 
     }
@@ -164,41 +162,41 @@ public class CDRadioModule {
 //        getInstance().getRunningMode(mSerialPort.getOutputStream());
 //
 //    }
-    public void toggleCKFO(boolean isToOpen) throws IOException {
+    public void toggleCKFO(boolean isToOpen) throws Exception {
         getInstance().toggleCKFO(mSerialPort.getOutputStream(),isToOpen);
     }
-    public void checkIsOpenCKFO() throws IOException {
+    public void checkIsOpenCKFO() throws Exception {
         getInstance().checkIsOpenCKFO(mSerialPort.getOutputStream());
 
     }
-    public void toggle1PPS(boolean isToOpen) throws IOException {
+    public void toggle1PPS(boolean isToOpen) throws Exception {
         getInstance().toggle1PPS(mSerialPort.getOutputStream(),isToOpen);
 
     }
-    public void checkIsOpen1PPS() throws IOException {
+    public void checkIsOpen1PPS() throws Exception {
         getInstance().checkIsOpen1PPS(mSerialPort.getOutputStream());
     }
-    public void beginSysUpgrade(File srcFile) throws IOException {
+    public void beginSysUpgrade(File srcFile) throws Exception {
 //        getInstance().beginSysUpgrade(mSerialPort.getOutputStream());
         getInstance().startUpgrade(mSerialPort.getOutputStream(),srcFile);
     }
-    public void getSysVersion() throws IOException {
+    public void getSysVersion() throws Exception {
         getInstance().getSysVersion(mSerialPort.getOutputStream());
 
     }
-    public void setChipId(String id) throws IOException, InputFormatException {
+    public void setChipId(String id) throws Exception{
         getInstance().setChipId(mSerialPort.getOutputStream(),id);
 
     }
-    public void getChipId() throws IOException {
+    public void getChipId() throws Exception {
         getInstance().getChipId(mSerialPort.getOutputStream());
 
     }
-    public void getSNR() throws IOException {
+    public void getSNR() throws Exception {
         getInstance().getSNR(mSerialPort.getOutputStream());
 
     }
-    public void getSysState() throws IOException {
+    public void getSysState() throws Exception {
         getInstance().getSysState(mSerialPort.getOutputStream());
 
     }
@@ -206,19 +204,19 @@ public class CDRadioModule {
         getInstance().getCFO(mSerialPort.getOutputStream());
 
     }
-    public void getSFO() throws IOException {
+    public void getSFO() throws Exception {
         getInstance().getSFO(mSerialPort.getOutputStream());
 
     }
-    public void getTunerState() throws IOException {
+    public void getTunerState() throws Exception {
         getInstance().getTunerState(mSerialPort.getOutputStream());
 
     }
-    public void getLDPC() throws IOException {
+    public void getLDPC() throws Exception {
         getInstance().getLDPC(mSerialPort.getOutputStream());
 
     }
-    public void setLogLevel(String level) throws IOException, InputFormatException,NumberFormatException {
+    public void setLogLevel(String level) throws Exception{
         getInstance().setLogLevel(mSerialPort.getOutputStream(),level);
 
     }
@@ -231,11 +229,11 @@ public class CDRadioModule {
         getInstance().startMatchFreq(mSerialPort.getOutputStream());
     }
 
-    public void stopSearchFreq() throws IOException {
+    public void stopSearchFreq() throws Exception {
         getInstance().stopMatchFreq(mSerialPort.getOutputStream());
     }
 
-    public void verifyFreq(String freq) throws IOException {
+    public void verifyFreq(String freq) throws Exception {
         getInstance().verifyFreq(mSerialPort.getOutputStream(),freq);
     }
 }

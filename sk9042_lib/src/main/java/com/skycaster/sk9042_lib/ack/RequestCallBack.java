@@ -288,4 +288,13 @@ public abstract class RequestCallBack {
     protected void onUpgradeFinish(boolean isSuccess, String errorCode) {
 
     }
+
+    /**
+     * 获取SK9042差分数据输出端串口的波特率
+     * @param isValid 波特率是否为有效数字，当为true的时候，可以把result转成整数，false的时候，result表示实际获取的结果，以字符串表示。
+     * @param result 查询结果
+     */
+    public void getBaudRate(boolean isValid, String result) {
+
+    }
 }

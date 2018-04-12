@@ -8,7 +8,7 @@ package com.skycaster.sk9042_lib.request;
 public enum RequestType {
     TEST_CONN,RESET, GET_TIME,SET_BD_RATE,SET_FREQ, GET_FREQ,SET_REV_MODE, GET_REV_MODE,SYS_UPGRADE_START,
     TOGGLE_1PPS, GET_1PPS,TOGGLE_CKFO, GET_CKFO, GET_VERSION, SET_CHIP_ID, GET_CHIP_ID, GET_SNR, GET_SYS_STATE, GET_SFO,
-    GET_CFO, GET_TUNER, GET_LDPC,SET_LOG_LEVEL, AUTO_MATCH_FREQ,VERIFY_FREQ;
+    GET_CFO, GET_TUNER, GET_LDPC,SET_LOG_LEVEL, AUTO_MATCH_FREQ,VERIFY_FREQ,GET_BD_RATE;
 
     /**
      * 改写了每个枚举成员对应的字符串，方便拼接成指令。
@@ -71,6 +71,8 @@ public enum RequestType {
                 return "AT+SEARCH";
             case VERIFY_FREQ:
                 return "AT+CHECK:";
+            case GET_BD_RATE:
+                return "AT+BDRT?";
             default:
                 return super.toString();
         }

@@ -74,18 +74,15 @@ public class RequestManager {
      * 设置波特率。串口1为数据通道，默认波特率为115200。串口2为控制通道，默认波特率为57600。
      *串口1和串口2的波特率必须单独设置，如果波特率设置返回错误，应该排查以下情况：
      *1、命令格式是否正确。
-     *2、串口号参数uart只接受两个值：1和2。
-     *3、波特率参数只接受4个值：9600、57600，19200、115200。
-     *4、当前版本下串口号参数uart只接受1个值：1（不允许对串口1的波特率进行修改）。
+     *2、波特率参数只接受4个值：9600、57600，19200、115200。
      * @param os 串口输出流
-     * @param uart 用ASCII字符串表示,1或2
      * @param bdRate 用ASCII字符串表示，如:9600,即设置串口波特率为9600. bdRate值可以是9600、57600，19200、115200
      * @throws IOException 串口输出流报错
      * @throws NumberFormatException 当参数不符合上述规定时报错
      * @throws InputFormatException 当参数不符合上述规定时报错
      */
-    public synchronized void setBaudRate(OutputStream os,String uart,String bdRate) throws IOException,NumberFormatException,InputFormatException {
-        sendRequest(os, RequestType.SET_BD_RATE,uart,bdRate);
+    public synchronized void setBaudRate(OutputStream os,String bdRate) throws IOException,NumberFormatException,InputFormatException {
+        sendRequest(os, RequestType.SET_BD_RATE,bdRate);
     }
 
     /**
@@ -444,6 +441,19 @@ public class RequestManager {
         }
     }
 
+    /**
+     * 查询SK9042模块差分数据输出端串口的波特率
+     * @param os 串口输出流
+     * @throws IOException 串口输出流报错
+     */
+    public synchronized void getBaudRate(OutputStream os) throws IOException {
+        try {
+            sendRequest(os,RequestType.GET_BD_RATE);
+        } catch (InputFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**
@@ -475,19 +485,15 @@ public class RequestManager {
             case GET_TUNER:
             case GET_LDPC:
             case AUTO_MATCH_FREQ:
+            case GET_BD_RATE:
                 sb.append(rq.toString()).append(mAppendix);
                 break;
             case SET_BD_RATE:
-                Integer i3=Integer.valueOf((String)params[0]);
-                if(i3==1){
-                    Integer i4=Integer.valueOf((String)params[1]);
-                    if(i4==9600||i4==57600||i4==19200||i4==115200){
-                        sb.append(rq.toString()).append("=").append(params[0]).append(",").append(params[1]).append(mAppendix);
-                    }else {
-                        throw new InputFormatException("Serial port baud rate is confined to 9600, 57600, 19200, 115200.");
-                    }
+                Integer bdRate=Integer.valueOf((String)params[0]);
+                if(bdRate==9600||bdRate==57600||bdRate==19200||bdRate==115200){
+                    sb=buildCmdWithParam0(rq,params[0]);
                 }else {
-                    throw new InputFormatException("Serial port No. is confined to 1.");
+                    throw new InputFormatException("Serial port baud rate is confined to 9600, 57600, 19200, 115200.");
                 }
                 break;
             case SET_FREQ:

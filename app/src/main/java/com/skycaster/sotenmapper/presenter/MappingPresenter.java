@@ -245,7 +245,7 @@ public class MappingPresenter extends BasePresenter {
                     public void onGetInput(String input) {
                         try {
                             mCDRadioModule.setFreq(input);
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             handleException(e);
                         }
                     }
@@ -256,7 +256,7 @@ public class MappingPresenter extends BasePresenter {
     public void getCdRadioFreq() {
         try {
             mCDRadioModule.getFreq();
-        } catch (IOException e) {
+        } catch (Exception e) {
             handleException(e);
         }
     }

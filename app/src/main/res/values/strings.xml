@@ -57,6 +57,7 @@
         <item>开始搜台</item>//28
         <item>停止搜台</item>//29
         <item>校验频率</item>//30
+        <item>查询SK9042差分输出端波特率</item>//31
     </array>
     <string name="title_activity_mapping">MappingActivity</string>
     <string name="off_line_map">离线地图</string>
@@ -82,6 +83,7 @@
     <string name="pick_src_file">请点选文件</string>
     <string name="return_previous">返回上一层</string>
     <string name="exit">退出</string>
+    <string name="please_select_bd_rate">请选择波特率</string>
     <array name="gngga_test_lines">
         <item>$GNGGA,061923.00,2234.22210054,N,11356.24785338,E,5,05,2.8,48.923,M,-3.475,M,0.0,0693*67</item>
         <item>$GNGGA,061924.00,2234.22226763,N,11356.24775916,E,4,05,2.8,49.498,M,-3.475,M,0.0,0693*63</item>

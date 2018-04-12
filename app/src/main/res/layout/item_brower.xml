@@ -29,9 +29,10 @@
         android:id="@+id/tv_fileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="2"
+        android:maxLines="1"
         android:text="filename"
         android:textSize="@dimen/sp_10"
+        android:gravity="center"
         />
 
 </LinearLayout>

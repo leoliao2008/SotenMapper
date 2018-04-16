@@ -274,13 +274,18 @@ public class CDRadioTestPresenter extends BasePresenter {
         }catch (NullPointerException e){
             handleException(e);
         }
+
     }
 
 
 
     @Override
     public void onStart() {
-
+        try {
+            mCdRadioModule.openConnection(Static.DEFAULT_CD_RADIO_SP_PATH,Integer.valueOf(Static.DEFAULT_CD_RADIO_SP_BD_RATE),mAckDecipher);
+        } catch (Exception e) {
+            handleException(e);
+        }
     }
 
     @Override
@@ -295,14 +300,19 @@ public class CDRadioTestPresenter extends BasePresenter {
 
     @Override
     public void onStop() {
-        if(mActivity.isFinishing()){
-            try {
-                mCdRadioModule.closeConnection();
-            } catch (Exception e) {
-                handleException(e);
-            }
-            //测试用
-            closeGpsThread();
+//        if(mActivity.isFinishing()){
+//            try {
+//                mCdRadioModule.closeConnection();
+//            } catch (Exception e) {
+//                handleException(e);
+//            }
+//            //测试用
+//            closeGpsThread();
+//        }
+        try {
+            mCdRadioModule.closeConnection();
+        } catch (Exception e) {
+            handleException(e);
         }
 
     }
@@ -320,6 +330,7 @@ public class CDRadioTestPresenter extends BasePresenter {
 
     }
 
+    //此功能经串口测试稳定后不再使用
     public void showSpSettingWindow(){
         //3月28日为了测试展示暂时屏蔽这些代码
         String path = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH, Static.DEFAULT_CD_RADIO_SP_PATH);

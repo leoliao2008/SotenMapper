@@ -1,13 +1,17 @@
 package com.skycaster.sk9042_lib.ack;
 
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.skycaster.sk9042_lib.Static;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
+import java.io.OutputStream;
 
 /**
  * Created by 廖华凯 on 2018/3/16.
@@ -22,6 +26,9 @@ public class AckDecipher {
     private Thread mRevThread;
     private volatile boolean isInterrupted;
     private byte[] temp=new byte[Static.ACK_SIZE];
+    private static File mUpgradeFile;
+    private static OutputStream mUpgradeOutputStream;
+
 
 
 
@@ -303,13 +310,14 @@ public class AckDecipher {
                     break;
                 case "UDSEND"://表示已经复位成功，用户可以开始发送bin文件
                     if(split[1].equals("OK")){
-                        //利用反射获得private方法执行升级
-                        try {
-                            Method commenceUpgrade = RequestCallBack.class.getMethod("commenceUpgrade", new Class<?>[]{});
-                            commenceUpgrade.invoke(mCallBack, new Object(){});
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+//                        //利用反射获得private方法执行升级
+//                        try {
+//                            Method commenceUpgrade = RequestCallBack.class.getMethod("commenceUpgrade", null);
+//                            commenceUpgrade.invoke(mCallBack, new Object(){});
+//                        } catch (Exception e) {
+//                            showLog("error:"+e.getMessage());
+//                        }
+                        commenceUpgrade();
                     }
                     break;
                 case "STUD"://升级结果的回调
@@ -340,7 +348,56 @@ public class AckDecipher {
         return sb.toString();
     }
 
+    /**
+     * 通过发送升级文件，升级sk9042系统
+     */
+    private void commenceUpgrade() {
+        //在子线程中完成
+        showLog("commenceUpgrade");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                showLog("upgrade thread starts.");
+                byte[] temp=new byte[128];
+                int read=-1;
+                Handler handler=new Handler(Looper.getMainLooper());
+                try {
+                    FileInputStream inputStream=new FileInputStream(mUpgradeFile);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCallBack.onStartTransferringUpgradeFile();
+                        }
+                    });
+                    while ((read=inputStream.read(temp))>0){
+                        mUpgradeOutputStream.write(temp,0,read);
+                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCallBack.onFinishTransferringUpgradeFile();
+                        }
+                    });
+                } catch (Exception e) {
+                    showLog(e.getMessage());
+                }finally {
+                    mUpgradeFile=null;
+                    mUpgradeOutputStream=null;
+                }
+                showLog("upgrade thread ends.");
+            }
+        }).start();
+    }
+
     private void showLog(String msg){
         Log.e(getClass().getSimpleName(),msg);
+    }
+
+    public static void setUpgradeFile(File upgradeFile) {
+        mUpgradeFile = upgradeFile;
+    }
+
+    public static void setUpgradeOutputStream(OutputStream upgradeOutputStream) {
+        mUpgradeOutputStream = upgradeOutputStream;
     }
 }

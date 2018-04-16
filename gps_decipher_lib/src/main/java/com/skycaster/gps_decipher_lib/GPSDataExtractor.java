@@ -57,10 +57,10 @@ public class GPSDataExtractor {
     public static synchronized void decipherData(byte[] temp, int len, final GPSDataExtractorCallBack callBack){
         for(int i=0;i<len;i++){
             if(!isGPGGAHeadConfirmed){
-//                                showLog("Ack Head not confirmed.");
+                // showLog("Ack Head not confirmed.");
                 if(temp[i]=='$'){
                     isGPGGAHeadConfirmed =true;
-//                                    showLog("Ack Head is confirmed!");
+                    //showLog("Ack Head is confirmed!");
                     index=0;
                     GPGGAData[index++]=temp[i];
                 }else {
@@ -107,25 +107,23 @@ public class GPSDataExtractor {
                 }
             }
         }
-
-
     }
 
     private static synchronized boolean isSourceValid(String source) {
-        //showLog("begin to check if source valid...");
+        showLog("begin to check if source valid...:"+source);
         int checkSum=0;
         String[] data = source.split(Pattern.quote("*"));
         if(data.length==2){
             String[] dataCheck = data[0].split(Pattern.quote("$"));
-//            for(String s:dataCheck){
-//                showLog("dataCheck: "+s);
-//            }
+            for(String s:dataCheck){
+                showLog("dataCheck: "+s);
+            }
             if(dataCheck.length==2){
                 char[] chars = dataCheck[1].toCharArray();
                 for(char c:chars){
                     checkSum^=c;
                 }
-                //showLog("check sum="+ String.format("%X",checkSum)+" vs source ="+data[1].trim());
+                showLog("check sum="+ String.format("%X",checkSum)+" vs source ="+data[1].trim());
                 return Integer.toHexString(checkSum).equalsIgnoreCase(data[1].trim());
             }
         }

@@ -1,13 +1,6 @@
 package com.skycaster.sk9042_lib.ack;
 
-import android.os.Handler;
-
-import com.skycaster.sk9042_lib.request.RequestManager;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
+import android.util.Log;
 
 /**
  * Created by 廖华凯 on 2018/3/16.
@@ -213,54 +206,7 @@ public abstract class RequestCallBack {
 
     }
 
-    /**
-     * 通过发送升级文件，升级sk9042系统
-     */
-    private void commenceUpgrade() {
-        //在子线程中完成
-        final Handler handler=new Handler();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                File file= null;
-                OutputStream os=null;
-                try {
-                    //利用反射获得升级文件和输出流
-                    Field f1 = RequestManager.class.getField("mUpgradeFile");
-                    file= (File) f1.get(RequestManager.getInstance());
-                    Field f2 = RequestManager.class.getField("mOutputStream");
-                    os= (OutputStream) f2.get(RequestManager.getInstance());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(file==null||os==null){
-                    return;
-                }
-                byte[] temp=new byte[128];
-                int read=-1;
-                try {
-                    FileInputStream inputStream=new FileInputStream(file);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onStartTransferringUpgradeFile();
-                        }
-                    });
-                    while ((read=inputStream.read(temp))>0){
-                        os.write(temp,0,read);
-                    }
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onFinishTransferringUpgradeFile();
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
+
 
     /**
      * 开始发送升级文件的回调
@@ -296,5 +242,9 @@ public abstract class RequestCallBack {
      */
     public void getBaudRate(boolean isValid, String result) {
 
+    }
+
+    private void showLog(String msg){
+        Log.e(getClass().getSimpleName(),msg);
     }
 }

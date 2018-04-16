@@ -2,6 +2,8 @@ package com.skycaster.sk9042_lib.request;
 
 import android.util.Log;
 
+import com.skycaster.sk9042_lib.ack.AckDecipher;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,8 +18,6 @@ public class RequestManager {
     private String mAppendix="\r\n";
     private RequestManager(){}
     private volatile AtomicBoolean isSearchingFreq=new AtomicBoolean(false);
-    private File mUpgradeFile;
-    private OutputStream mOutputStream;
 
     /**
      * 以单例模式获得该类实例
@@ -386,8 +386,8 @@ public class RequestManager {
     public synchronized void startUpgrade(OutputStream os,File srcFile) throws IOException {
         try {
             //这里提取两个参数出来，要给requestCallback升级时调用
-            mUpgradeFile =srcFile;
-            mOutputStream=os;
+            AckDecipher.setUpgradeFile(srcFile);
+            AckDecipher.setUpgradeOutputStream(os);
             sendRequest(os,RequestType.SYS_UPGRADE_START,srcFile);
         } catch (InputFormatException e) {
             e.printStackTrace();

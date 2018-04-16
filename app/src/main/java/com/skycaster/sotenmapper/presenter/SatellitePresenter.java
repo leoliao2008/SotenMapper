@@ -92,6 +92,12 @@ public class SatellitePresenter extends BasePresenter {
 
     @Override
     public void onCreate() {
+
+
+    }
+
+    @Override
+    public void onStart() {
         try {
             mGpsModule.powerOn(new LocationListener() {
                 @Override
@@ -124,11 +130,6 @@ public class SatellitePresenter extends BasePresenter {
             handleException(e);
         }
 
-    }
-
-    @Override
-    public void onStart() {
-
 
     }
 
@@ -144,10 +145,7 @@ public class SatellitePresenter extends BasePresenter {
 
     @Override
     public void onStop() {
-        if(mActivity.isFinishing()){
-            mGpsModule.powerOff();
-        }
-
+        mGpsModule.powerOff();
     }
 
     @Override

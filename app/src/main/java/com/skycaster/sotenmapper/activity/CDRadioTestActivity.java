@@ -2,7 +2,6 @@ package com.skycaster.sotenmapper.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -57,13 +56,13 @@ public class CDRadioTestActivity extends BaseMVPActivity<CDRadioTestPresenter> {
                 mPresenter.toggleCdRadioPw(isChecked);
             }
         });
-
-        mBtnSpSetting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.showSpSettingWindow();
-            }
-        });
+        //4月16日 把串口写死，页面启动后自动连接
+//        mBtnSpSetting.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mPresenter.showSpSettingWindow();
+//            }
+//        });
 
     }
 

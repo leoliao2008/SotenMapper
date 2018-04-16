@@ -21,7 +21,9 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:background="@android:color/darker_gray">
+            //经测试稳定后，可以把串口写死。
             <Button
+                android:visibility="gone"
                 android:id="@+id/btn_sp_setting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

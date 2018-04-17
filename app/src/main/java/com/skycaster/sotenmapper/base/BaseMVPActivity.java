@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.skycaster.sotenmapper.impl.ImplBasePresenter;
+import com.skycaster.sotenmapper.utils.ToastUtil;
 
 import butterknife.ButterKnife;
 
@@ -75,5 +76,9 @@ public abstract class BaseMVPActivity<T extends ImplBasePresenter> extends AppCo
 
     protected void showLog(String msg){
         Log.e(getClass().getSimpleName(),msg);
+    }
+
+    protected void showToast(String msg){
+        ToastUtil.showToast(msg);
     }
 }

@@ -2,6 +2,7 @@ package com.skycaster.sotenmapper.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.TextSwitcher;
@@ -12,6 +13,9 @@ import com.skycaster.sotenmapper.R;
 import com.skycaster.sotenmapper.base.BaseMVPActivity;
 import com.skycaster.sotenmapper.presenter.MappingPresenter;
 import com.skycaster.sotenmapper.widget.LanternView;
+
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import butterknife.BindView;
 
@@ -26,6 +30,7 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
     LanternView mLanternView;
     @BindView(R.id.simulation_test)
     ToggleButton mSimulationTest;
+    private AtomicBoolean isRecordGpggaData=new AtomicBoolean(false);
 
     public static void start(Context context) {
         Intent starter = new Intent(context, MappingActivity.class);
@@ -74,12 +79,17 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
         return mLanternView;
     }
 
-    //不需要客户在这个页面设置参数，统一在事先在设置页面设置好了再进来。
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.mapping_activity_menu,menu);
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.mapping_activity_menu,menu);
+        MenuItem item = menu.findItem(R.id.toggle_gpgga_recorder);
+        if(isRecordGpggaData.get()){
+            item.setTitle(getResources().getString(R.string.stop_record_gpgga_data));
+        }else {
+            item.setTitle(getResources().getString(R.string.start_record_gpgga_data));
+        }
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -87,11 +97,18 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
             case android.R.id.home:
                 onBackPressed();
                 break;
-            case R.id.set_freq:
-                mPresenter.setCdRadioFreq();
-                break;
-            case R.id.check_freq:
-                mPresenter.getCdRadioFreq();
+            case R.id.toggle_gpgga_recorder:
+                isRecordGpggaData.set(!isRecordGpggaData.get());
+                if(isRecordGpggaData.get()){
+                    mPresenter.startRecordingGpggaData();
+                }else {
+                    try {
+                        mPresenter.stopRecordingGpggaData();
+                    } catch (IOException e) {
+                        mPresenter.handleException(e);
+                    }
+                }
+                invalidateOptionsMenu();
                 break;
             default:
                 break;

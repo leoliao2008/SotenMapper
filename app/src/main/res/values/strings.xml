@@ -84,6 +84,9 @@
     <string name="return_previous">返回上一层</string>
     <string name="exit">退出</string>
     <string name="please_select_bd_rate">请选择波特率</string>
+    <string name="please_input_file_name">请输入文档名称</string>
+    <string name="start_record_gpgga_data">开始记录GPGGA数据</string>
+    <string name="stop_record_gpgga_data">停止记录GPGGA数据</string>
     <array name="gngga_test_lines">
         <item>$GNGGA,061923.00,2234.22210054,N,11356.24785338,E,5,05,2.8,48.923,M,-3.475,M,0.0,0693*67</item>
         <item>$GNGGA,061924.00,2234.22226763,N,11356.24775916,E,4,05,2.8,49.498,M,-3.475,M,0.0,0693*63</item>

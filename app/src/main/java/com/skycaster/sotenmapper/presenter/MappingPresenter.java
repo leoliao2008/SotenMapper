@@ -34,12 +34,14 @@ import com.skycaster.sotenmapper.base.BasePresenter;
 import com.skycaster.sotenmapper.callbacks.AlertDialogCallBack;
 import com.skycaster.sotenmapper.module.BaiduMapModule;
 import com.skycaster.sotenmapper.module.CDRadioModule;
+import com.skycaster.sotenmapper.module.FileWriterModule;
 import com.skycaster.sotenmapper.module.GpsModule;
 import com.skycaster.sotenmapper.utils.AlertDialogUtils;
-import com.skycaster.sotenmapper.utils.ToastUtil;
 import com.skycaster.sotenmapper.widget.LanternView;
 
 import java.io.IOException;
+
+import static com.skycaster.sotenmapper.utils.ToastUtil.showToast;
 
 /**
  * Created by 廖华凯 on 2018/3/26.
@@ -74,6 +76,15 @@ public class MappingPresenter extends BasePresenter {
                 //跳到新坐标
                 mMapModule.updateMyLocation(new LatLng(location.getLatitude(), location.getLongitude()));
             }
+            //记录定位数据
+            if(mFileWriterModule!=null){
+                byte[] bytes = bean.getRawString().getBytes();
+                try {
+                    mFileWriterModule.write(bytes,bytes.length);
+                } catch (IOException e) {
+                    handleException(e);
+                }
+            }
         }
 
         @Override
@@ -105,7 +116,7 @@ public class MappingPresenter extends BasePresenter {
     private RequestCallBack mRequestCallBack = new RequestCallBack() {
         @Override
         public void setFreq(boolean isSuccess) {
-            ToastUtil.showToast(mActivity.getString(R.string.sk9042_freq_setting)+isSuccess);
+            showToast(mActivity.getString(R.string.sk9042_freq_setting)+isSuccess);
         }
 
         @Override
@@ -116,7 +127,7 @@ public class MappingPresenter extends BasePresenter {
             }else {
                 sb.append(mActivity.getString(R.string.freq_param_is_not_stored_in_flash));
             }
-            ToastUtil.showToast(sb.toString());
+            showToast(sb.toString());
         }
     };
     private AckDecipher mAckDecipher;
@@ -126,6 +137,7 @@ public class MappingPresenter extends BasePresenter {
     private int mCnt;
     private String[] mTestLines;
     private Handler mHandler=new Handler();
+    private FileWriterModule mFileWriterModule;
 
 
     //********************************************函数区******************************************//
@@ -229,6 +241,11 @@ public class MappingPresenter extends BasePresenter {
             }finally {
                 mCDRadioModule.powerOff();
             }
+            try {
+                stopRecordingGpggaData();
+            } catch (IOException e) {
+                handleException(e);
+            }
         }
     }
 
@@ -281,5 +298,30 @@ public class MappingPresenter extends BasePresenter {
     public void stopTest(){
         mHandler.removeCallbacks(mTestRunnable);
         startGps();
+    }
+
+    public void startRecordingGpggaData(){
+        AlertDialogUtils.showGenNewFileNameWindow(
+                mActivity,
+                new AlertDialogCallBack(){
+                    @Override
+                    public void onGetInput(String input) {
+                        try {
+                            mFileWriterModule=new FileWriterModule(mActivity,input);
+                            showToast("开始记录GPGGA数据。");
+                        } catch (IOException e) {
+                            handleException(e);
+                        }
+                    }
+                }
+        );
+    }
+
+    public void stopRecordingGpggaData() throws IOException {
+        if(mFileWriterModule!=null){
+            mFileWriterModule.finish();
+            mFileWriterModule=null;
+            showToast("已经停止GPGGA数据。");
+        }
     }
 }

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.skycaster.sotenmapper.R;
 import com.skycaster.sotenmapper.adapter.BrowserAdapter;
 import com.skycaster.sotenmapper.callbacks.AlertDialogCallBack;
+import com.skycaster.sotenmapper.module.FileWriterModule;
 import com.skycaster.sotenmapper.module.SerialPortModule;
 
 import java.io.File;
@@ -159,6 +160,21 @@ public class AlertDialogUtils {
         alertDialog.show();
     }
 
+    /**
+     * 创建新文件前，设置文件名称的窗口
+     * @param context 上下文
+     * @param callBack 回调 ，onGetInput()中可以获取文件名
+     */
+    public static void showGenNewFileNameWindow(Context context, AlertDialogCallBack callBack){
+        showInputWindow(
+                context,
+                context.getResources().getString(R.string.please_input_file_name),
+                InputType.TYPE_CLASS_TEXT,
+                FileWriterModule.genFileNameByDate(),
+                false,
+                callBack);
+    }
+
 
 
     //***************************************************private*********************************************************
@@ -218,6 +234,11 @@ public class AlertDialogUtils {
     }
 
     private static void showInputWindow(Context context,String title,int inputType,final AlertDialogCallBack callBack){
+        showInputWindow(context,title,inputType,null,true,callBack);
+    }
+
+
+    private static void showInputWindow(Context context,String title,int inputType,@Nullable String defaultInput, boolean isCancelable,final AlertDialogCallBack callBack){
         View rootView = View.inflate(context, R.layout.dialog_get_input, null);
         TextView tv_title=rootView.findViewById(R.id.dialog_tv_title);
         final EditText edt_input=rootView.findViewById(R.id.dialog_edt_input);
@@ -225,6 +246,10 @@ public class AlertDialogUtils {
         Button btn_confirm=rootView.findViewById(R.id.dialog_btn_confirm);
         Button btn_cancel=rootView.findViewById(R.id.dialog_btn_cancel);
         tv_title.setText(title);
+        if(defaultInput!=null){
+            edt_input.setText(defaultInput);
+            edt_input.setSelection(defaultInput.length());
+        }
         btn_confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -240,9 +265,11 @@ public class AlertDialogUtils {
             }
         });
         AlertDialog.Builder builder=new AlertDialog.Builder(context);
-        alertDialog=builder.setView(rootView).create();
+        alertDialog=builder.setView(rootView).setCancelable(isCancelable).create();
         alertDialog.show();
     }
+
+
 
     private static void showSpSettingWindow(
             Context context,

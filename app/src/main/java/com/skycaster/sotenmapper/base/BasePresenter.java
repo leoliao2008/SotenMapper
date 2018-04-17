@@ -19,7 +19,7 @@ public abstract class BasePresenter implements ImplBasePresenter {
         Log.e(mTag,msg);
     }
 
-    protected void handleException(Exception e){
+    public void handleException(Exception e){
         ToastUtil.showToast(e.getMessage());
     }
 }

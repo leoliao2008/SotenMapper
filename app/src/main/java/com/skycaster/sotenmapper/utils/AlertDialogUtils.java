@@ -90,7 +90,7 @@ public class AlertDialogUtils {
     }
 
     public static void showSK9042SetReceiveModeWindow(Context context,AlertDialogCallBack callBack){
-        String [] modes=new String[]{"2","3"};
+        String [] modes=new String[]{"2","3","4"};
         showSpinSelections(context,context.getString(R.string.please_set_receive_mode),modes,callBack);
     }
 

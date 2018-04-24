@@ -176,9 +176,9 @@ public class CDRadioTestPresenter extends BasePresenter {
         }
 
         @Override
-        public void getTunerState(String isSet, String hasData) {
-            super.getTunerState(isSet, hasData);
-            updateConsole((isSet.equals("1")?"Tuner设置成功":"Tuner设置失败")+" "+(hasData.equals("1")?"有数据输入。":"没数据输入。"));
+        public void getTunerState(boolean isSet) {
+            super.getTunerState(isSet);
+            updateConsole(isSet?"Tuner设置成功":"Tuner设置失败");
         }
 
         @Override

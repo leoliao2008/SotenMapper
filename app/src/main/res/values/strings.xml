@@ -44,7 +44,7 @@
         <item>查询1PPS开关</item>//15
         <item>启动升级</item>//16
         <item>启动升级数据传输</item>//17
-        <item>查询软件版本</item>//18
+        <item>查询SK9042系统版本</item>//18
         <item>设置产品ID</item>//19
         <item>查询产品ID</item>//20
         <item>查询信噪比</item>//21
@@ -87,6 +87,9 @@
     <string name="please_input_file_name">请输入文档名称</string>
     <string name="start_record_gpgga_data">开始记录GPGGA数据</string>
     <string name="stop_record_gpgga_data">停止记录GPGGA数据</string>
+    <string name="pause">暂停</string>
+    <string name="start">开始</string>
+    <string name="save">保存</string>
     <array name="gngga_test_lines">
         <item>$GNGGA,061923.00,2234.22210054,N,11356.24785338,E,5,05,2.8,48.923,M,-3.475,M,0.0,0693*67</item>
         <item>$GNGGA,061924.00,2234.22226763,N,11356.24775916,E,4,05,2.8,49.498,M,-3.475,M,0.0,0693*63</item>

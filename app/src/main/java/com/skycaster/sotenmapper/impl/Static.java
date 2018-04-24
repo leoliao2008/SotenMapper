@@ -16,4 +16,5 @@ public interface Static {
     String DEFAULT_CD_RADIO_SP_BD_RATE="57600";
     String BAIDU_LBS_APP_KEY="vQokgZ4ly1giDVjpPdiPw1qA2GoeMGTc";
 
+    String LAST_UPDATE = "LAST_UPDATE";
 }

@@ -1,38 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="center">
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/iv_content_dir"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/selector_content_dir"/>
-        <ImageView
-            android:id="@+id/iv_empty_dir"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/selector_empty_dir"/>
-        <ImageView
-            android:id="@+id/iv_file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/selector_file"/>
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/tv_fileName"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:text="filename"
-        android:textSize="@dimen/sp_10"
+        android:orientation="vertical"
         android:gravity="center"
-        />
+        android:layout_margin="@dimen/dp_10">
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/iv_content_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/selector_content_dir"/>
+            <ImageView
+                android:id="@+id/iv_empty_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/selector_empty_dir"/>
+            <ImageView
+                android:id="@+id/iv_file"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/selector_file"/>
+        </FrameLayout>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_fileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="filename"
+            android:textSize="@dimen/sp_10"
+            android:gravity="center"
+            android:maxLines="3"
+            />
+
+    </LinearLayout>
+
+
+</FrameLayout>

@@ -106,22 +106,22 @@ public class LocalMapListFragment extends BaseFragment {
     public void onGetOfflineMapState(int type, int state){
         switch (type) {
             case MKOfflineMap.TYPE_DOWNLOAD_UPDATE: {
-                MKOLUpdateElement downLoadProgress = mManager.getUpdateInfo(state);
-                if(!isLocalMapsContain(downLoadProgress)){
-                    mLocalMaps.add(new MyMKOLUpdateElement(downLoadProgress));
+                MKOLUpdateElement downLoadMap = mManager.getUpdateInfo(state);
+                if(!isLocalMapsContain(downLoadMap)){
+                    mLocalMaps.add(new MyMKOLUpdateElement(downLoadMap));
                 }
                 // 处理下载进度更新提示
-                if(downLoadProgress!=null){
+                if(downLoadMap!=null){
                     for(int i=0;i<mLocalMaps.size();i++){
-                        if(mAdapter.getItemId(i)==downLoadProgress.cityID){
-                            mLocalMaps.get(i).ratio=downLoadProgress.ratio;
+                        if(mAdapter.getItemId(i)==downLoadMap.cityID){
+                            mLocalMaps.get(i).ratio=downLoadMap.ratio;
                             mAdapter.notifyDataSetChanged();
                             break;
                         }
                     }
-                    showLog(String.format(Locale.CHINA,"地图%s 下载进度%d%%...",downLoadProgress.cityName,downLoadProgress.ratio));
-                    if(downLoadProgress.ratio==100){
-                        ToastUtil.showToast( String.format("地图下载完成：%s!",downLoadProgress.cityName));
+                    showLog(String.format(Locale.CHINA,"地图%s 下载进度%d%%...",downLoadMap.cityName,downLoadMap.ratio));
+                    if(downLoadMap.ratio==100){
+                        ToastUtil.showToast( String.format("地图下载完成：%s!",downLoadMap.cityName));
                     }
                 }
             }
@@ -148,9 +148,9 @@ public class LocalMapListFragment extends BaseFragment {
         }
     }
 
-    private boolean isLocalMapsContain(MKOLUpdateElement downLoadProgress) {
+    private boolean isLocalMapsContain(MKOLUpdateElement downLoadMap) {
         for(MyMKOLUpdateElement temp:mLocalMaps){
-            if(temp.equals(downLoadProgress)){
+            if(temp.equals(downLoadMap)){
                 return true;
             }
         }

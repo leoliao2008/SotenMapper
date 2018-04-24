@@ -156,10 +156,9 @@ public abstract class RequestCallBack {
 
     /**
      *
-     * @param isSet Tuner设置状态。用ASCII字符串表示：0：设置失败 1：设置成功
-     * @param hasData Tuner数据状态。用ASCII字符串表示：0：无数据输入 1：有数据输入
+     * @param isSet Tuner设置状态。ture表示设置成功，false表示设置失败。
      */
-    protected void getTunerState(String isSet, String hasData) {
+    protected void getTunerState(boolean isSet) {
 
     }
 

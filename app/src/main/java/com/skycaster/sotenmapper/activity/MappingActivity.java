@@ -2,6 +2,7 @@ package com.skycaster.sotenmapper.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
@@ -30,7 +31,9 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
     LanternView mLanternView;
     @BindView(R.id.simulation_test)
     ToggleButton mSimulationTest;
-    private AtomicBoolean isRecordGpggaData=new AtomicBoolean(false);
+    private AtomicBoolean isPauseRecordLoc=new AtomicBoolean(false);//是否已经暂停记录定位信息
+    private ActionMode mActionModeRecordLocData;
+
 
     public static void start(Context context) {
         Intent starter = new Intent(context, MappingActivity.class);
@@ -82,33 +85,67 @@ public class MappingActivity extends BaseMVPActivity<MappingPresenter> {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.mapping_activity_menu,menu);
-        MenuItem item = menu.findItem(R.id.toggle_gpgga_recorder);
-        if(isRecordGpggaData.get()){
-            item.setTitle(getResources().getString(R.string.stop_record_gpgga_data));
-        }else {
-            item.setTitle(getResources().getString(R.string.start_record_gpgga_data));
-        }
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 break;
-            case R.id.toggle_gpgga_recorder:
-                isRecordGpggaData.set(!isRecordGpggaData.get());
-                if(isRecordGpggaData.get()){
-                    mPresenter.startRecordingGpggaData();
-                }else {
-                    try {
-                        mPresenter.stopRecordingGpggaData();
-                    } catch (IOException e) {
-                        mPresenter.handleException(e);
+            case R.id.toggle_gpgga_recorder://切换actionbar的内容，开始记录定位信息到本地
+                mPresenter.startRecordingGpggaData();
+                mActionModeRecordLocData = startActionMode(new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                        getMenuInflater().inflate(R.menu.action_mode_record_gpgga_data, menu);
+                        mode.setTitle("定位记录中");
+                        return true;
                     }
-                }
-                invalidateOptionsMenu();
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        //暂停和继续只能同时显示一个
+                        MenuItem itemPause = menu.findItem(R.id.pause);
+                        MenuItem itemPlay = menu.findItem(R.id.play);
+                        itemPause.setVisible(!isPauseRecordLoc.get());
+                        itemPlay.setVisible(isPauseRecordLoc.get());
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.play://继续
+                                mPresenter.resumeRecordingCpggaData();
+                                isPauseRecordLoc.set(false);
+                                mode.invalidate();
+                                break;
+                            case R.id.pause://暂停
+                                mPresenter.pauseRecordingGpggaData();
+                                isPauseRecordLoc.set(true);
+                                mode.invalidate();
+                                break;
+                            case R.id.save://保存并退出模式
+                                mActionModeRecordLocData.finish();
+                                break;
+                            default:
+                                break;
+                        }
+                        return true;
+                    }
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+                        //退出模式时，终止记录定位
+                        try {
+                            mPresenter.terminateRecordingGpggaData();
+                        } catch (IOException e) {
+                            mPresenter.handleException(e);
+                        }
+
+                    }
+                });
                 break;
             default:
                 break;

@@ -120,7 +120,7 @@ public class RequestManager {
      * 设置接收模式。用户设置接收模式后，接收模式会立即生效。但是因为算法在进行快搜时，无法及时响应AT指令，所以用户设置接收模式后，可能会表现出一些延迟。
      * 模式信息会写flash，算法下次启动时，会从flash中读取模式信息。即算法会运行在上次用户设置的模式上。如果用户从来没有设置过接收模式，会运行在模式2。
      * @param os 串口输出流
-     * @param mode 用ASCII字符串表示：2：模式2  3：模式3
+     * @param mode 用ASCII字符串表示：2：模式2；3：模式3；4：模式4；
      * @throws IOException 串口输出流报错
      * @throws InputFormatException 当参数不符合上述规定时报错
      * @throws NumberFormatException 当参数不符合上述规定时报错
@@ -502,10 +502,10 @@ public class RequestManager {
                 break;
             case SET_REV_MODE:
                 Integer i5=Integer.valueOf((String)params[0]);
-                if(i5==2||i5==3){
+                if(i5==2||i5==3||i5==4){
                     sb= buildCmdWithParam0(rq,params[0]);
                 }else {
-                    throw new InputFormatException("Receive mode is confined to 2 or 3.");
+                    throw new InputFormatException("Receive mode is confined to 2,3 or 4.");
                 }
                 break;
             case TOGGLE_CKFO:

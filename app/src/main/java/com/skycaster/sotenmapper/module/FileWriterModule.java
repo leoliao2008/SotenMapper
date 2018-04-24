@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by 廖华凯 on 2018/4/17.
@@ -22,6 +23,7 @@ public class FileWriterModule {
 
     private FileInputStream mInputStream;//保留
     private FileOutputStream mOutputStream;
+    private AtomicBoolean mIsPause=new AtomicBoolean(false);
 
     /**
      * 生成本地文件，用来保存数据。
@@ -53,7 +55,7 @@ public class FileWriterModule {
      * @throws IOException 文件读写异常
      */
     public synchronized void write(byte[] data,int len) throws IOException {
-        if(mOutputStream !=null){
+        if(mOutputStream !=null&&!mIsPause.get()){
             mOutputStream.write(data,0,len);
             mOutputStream.write("\r\n".getBytes());//因为原始定位数据没有自带换行符，为了阅读方便，所以要增加换行符
             mOutputStream.flush();
@@ -61,10 +63,24 @@ public class FileWriterModule {
     }
 
     /**
+     * 暂停保存数据
+     */
+    public synchronized void pause(){
+        mIsPause.set(true);
+    }
+
+    /**
+     * 继续保存数据
+     */
+    public synchronized void resume(){
+        mIsPause.set(false);
+    }
+
+    /**
      * 结束记录后关闭流以节省系统资源。
      * @throws IOException 文件读写异常
      */
-    public synchronized void finish() throws IOException {
+    public synchronized void close() throws IOException {
         mOutputStream.flush();
         mOutputStream.close();
     }

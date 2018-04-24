@@ -257,9 +257,10 @@ public class AckDecipher {
                     mCallBack.getCFO(split[1]);
                     break;
                 case "GET_TUNER":
-                    String[] spl1 = split[1].split(",");
-                    if(spl1.length==2){
-                        mCallBack.getTunerState(spl1[0],spl1[1]);
+                    if(split[1].equals("OK")){
+                        mCallBack.getTunerState(true);
+                    }else if(split[1].equals("ERROR")){
+                        mCallBack.getTunerState(false);
                     }
                     break;
                 case "GET_LDPC":

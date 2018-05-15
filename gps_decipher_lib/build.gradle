@@ -13,6 +13,24 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
+
+    def SDK_NAME = "GPS_DECIPHER_Lib";//jar包的名称
+    def SDK_VERSION = "_V1.0";//jar包的版本号
+    def sdkDestinationPath = "build";
+    def zipFile = file('build/intermediates/bundles/default/classes.jar')
+
+    task deleteBuild(type: Delete) {
+        delete sdkDestinationPath + SDK_NAME + SDK_VERSION + ".jar"
+    }
+
+    task makeJar(type: Jar) {
+        from zipTree(zipFile)
+        from fileTree(dir: 'src/main',includes: ['assets/**'])
+        baseName = SDK_NAME + SDK_VERSION
+        destinationDir = file(sdkDestinationPath)
+    }
+
+    makeJar.dependsOn(deleteBuild, build)
     buildTypes {
         release {
             minifyEnabled false
@@ -20,6 +38,8 @@ android {
         }
     }
 }
+
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

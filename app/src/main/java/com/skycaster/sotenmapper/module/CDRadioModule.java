@@ -4,6 +4,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import com.skycaster.sk9042_lib.ack.AckDecipher;
+import com.skycaster.sotenmapper.impl.Static;
 import com.skycaster.sotenmapper.utils.StreamOptimizer;
 import com.soten.libs.utils.LogUtils;
 import com.soten.libs.utils.PowerManagerUtils;
@@ -53,9 +54,14 @@ public class CDRadioModule {
     }
 
 
-    public void openConnection(String path, int bdRate, final AckDecipher ackDecipher) throws Exception{
+    /**
+     * 打开SK9042模块的串口，在子线程中监听串口数据，解析卫星数据
+     * @param ackDecipher
+     * @throws Exception
+     */
+    public void openConnection(final AckDecipher ackDecipher) throws Exception{
         closeConnection();
-        mSerialPort=mSerialPortModule.openSerialPort(path,bdRate);
+        mSerialPort=mSerialPortModule.openSerialPort(Static.DEFAULT_CD_RADIO_SP_PATH,Static.DEFAULT_CD_RADIO_SP_BD_RATE);
         if(mSerialPort!=null){
 //            showLog("sp != null! begin to read sp......");
             mRevTread = new Thread(new Runnable() {
@@ -104,6 +110,10 @@ public class CDRadioModule {
     }
 
 
+    /**
+     * 关闭SK9042的串口，停止监听串口数据。
+     * @throws Exception
+     */
     public void closeConnection() throws Exception {
 //        showLog("closeConnection  -start");
         if(mRevTread!=null&&mRevTread.isAlive()){

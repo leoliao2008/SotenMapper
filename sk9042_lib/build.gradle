@@ -8,14 +8,14 @@ android {
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.5"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
 
     def SDK_NAME = "SK9042Lib";//jar包的名称
-    def SDK_VERSION = "_V1.0";//jar包的版本号
+    def SDK_VERSION = "_V1.5";//jar包的版本号
     def sdkDestinationPath = "build";
     def zipFile = file('build/intermediates/bundles/default/classes.jar')
 

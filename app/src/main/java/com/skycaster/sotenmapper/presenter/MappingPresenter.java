@@ -27,8 +27,6 @@ import com.skycaster.gps_decipher_lib.GPGSA.GPGSABean;
 import com.skycaster.gps_decipher_lib.GPGSV.GPGSVBean;
 import com.skycaster.gps_decipher_lib.GPSDataExtractor;
 import com.skycaster.gps_decipher_lib.GPSDataExtractorCallBack;
-import com.skycaster.sk9042_lib.ack.AckDecipher;
-import com.skycaster.sk9042_lib.ack.RequestCallBack;
 import com.skycaster.sotenmapper.R;
 import com.skycaster.sotenmapper.activity.MappingActivity;
 import com.skycaster.sotenmapper.base.BaseApplication;
@@ -120,24 +118,7 @@ public class MappingPresenter extends BasePresenter {
 
         }
     };
-    private RequestCallBack mRequestCallBack = new RequestCallBack() {
-        @Override
-        public void setFreq(boolean isSuccess) {
-            showToast(mActivity.getString(R.string.sk9042_freq_setting)+isSuccess);
-        }
 
-        @Override
-        public void getFreq(boolean isAvailable, String freq) {
-            StringBuilder sb=new StringBuilder();
-            if(isAvailable){
-                sb.append(mActivity.getString(R.string.sk9042_current_freq_is)).append(freq);
-            }else {
-                sb.append(mActivity.getString(R.string.freq_param_is_not_stored_in_flash));
-            }
-            showToast(sb.toString());
-        }
-    };
-    private AckDecipher mAckDecipher;
     private TextSwitcher mTextSwitcher;
     private LanternView mLanternView;
     private FrameLayout.LayoutParams mLayoutParams;//txt switch子view的布局参数
@@ -147,6 +128,16 @@ public class MappingPresenter extends BasePresenter {
     private FileWriterModule mFileWriterModule;
     private AtomicBoolean isRunningTest=new AtomicBoolean(false);
     private String mLastUpdate;//记录上一次的定位数据，便于下次进来时直接返回上一次位置
+    private Runnable mTestRunnable =new Runnable() {//这个是专门用来测试的
+        @Override
+        public void run() {
+            if(isRunningTest.get()){
+                byte[] bytes = mTestLines[(mCnt++) % mTestLines.length].getBytes();
+                GPSDataExtractor.decipherData(bytes,bytes.length,mGPSDataExtractorCallBack);
+                mHandler.postDelayed(mTestRunnable,1000);
+            }
+        }
+    };
 
 
     //********************************************函数区******************************************//
@@ -158,7 +149,6 @@ public class MappingPresenter extends BasePresenter {
     @Override
     public void onCreate() {
         mMapView=mActivity.getMapView();
-        mAckDecipher = new AckDecipher(mRequestCallBack);
         mMapModule=new BaiduMapModule(mActivity.getMapView().getMap());
         mLanternView = mActivity.getLanternView();
         startCdRadio();
@@ -231,13 +221,6 @@ public class MappingPresenter extends BasePresenter {
     private void startCdRadio() {
         mCDRadioModule=new CDRadioModule((PowerManager) mActivity.getSystemService(Context.POWER_SERVICE));
         mCDRadioModule.powerOn();
-//        String path= BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH,Static.DEFAULT_CD_RADIO_SP_PATH);
-//        String bd=BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES,Static.DEFAULT_CD_RADIO_SP_BD_RATE);
-//        try {
-//            mCDRadioModule.openConnection(path,Integer.valueOf(bd), mAckDecipher);
-//        } catch (Exception e) {
-//            handleException(e);
-//        }
     }
 
     @Override
@@ -297,41 +280,8 @@ public class MappingPresenter extends BasePresenter {
         mMapView.onDestroy();
     }
 
-    public void setCdRadioFreq() {
-        AlertDialogUtils.showSK9042SetFreqWindow(
-                mActivity,
-                new AlertDialogCallBack(){
-                    @Override
-                    public void onGetInput(String input) {
-                        try {
-                            mCDRadioModule.setFreq(input);
-                        } catch (Exception e) {
-                            handleException(e);
-                        }
-                    }
-                }
-        );
-    }
-
-    public void getCdRadioFreq() {
-        try {
-            mCDRadioModule.getFreq();
-        } catch (Exception e) {
-            handleException(e);
-        }
-    }
 
 
-    private Runnable mTestRunnable =new Runnable() {
-        @Override
-        public void run() {
-            if(isRunningTest.get()){
-                byte[] bytes = mTestLines[(mCnt++) % mTestLines.length].getBytes();
-                GPSDataExtractor.decipherData(bytes,bytes.length,mGPSDataExtractorCallBack);
-                mHandler.postDelayed(mTestRunnable,1000);
-            }
-        }
-    };
 
 
     public void startTest(){

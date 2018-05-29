@@ -11,9 +11,9 @@ public interface Static {
     String GPS_BD_RATE="GPS_BD_RATE";
     String GPS_SP_PATH="GPS_SP_PATH";
     String DEFAULT_GPS_SP_PATH="/dev/ttyMT1";
-    String DEFAULT_GPS_SP_BD_RATE="115200";
+    int DEFAULT_GPS_SP_BD_RATE=9600;
     String DEFAULT_CD_RADIO_SP_PATH="/dev/ttyMT2";
-    String DEFAULT_CD_RADIO_SP_BD_RATE="57600";
+    int DEFAULT_CD_RADIO_SP_BD_RATE=57600;
     String BAIDU_LBS_APP_KEY="vQokgZ4ly1giDVjpPdiPw1qA2GoeMGTc";
 
     String LAST_UPDATE = "LAST_UPDATE";

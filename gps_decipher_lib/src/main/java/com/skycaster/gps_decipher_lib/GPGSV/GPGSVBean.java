@@ -10,10 +10,9 @@ import java.util.regex.Pattern;
 
 /**
  * Created by 廖华凯 on 2018/1/8.
- * GPS Satellites in View（GSV）可见卫星信息
+ * GPS Satellites in View（GSV）可见卫星信息，包含了当前卫星个数、PRN码、方位、俯仰角等，可以用来绘制卫星图
  * 参考网站：http://blog.csdn.net/lzyzuixin/article/details/6161507
  */
-
 public class GPGSVBean extends BaseBean {
 //    例：$GPGSV,3,1,10,20,78,331,45,01,59,235,47,22,41,069,,13,32,252,45*70
 //    字段0：$GPGSV，语句ID，表明该语句为GPS Satellites in View（GSV）可见卫星信息
@@ -74,7 +73,7 @@ public class GPGSVBean extends BaseBean {
         int satCount= TextUtils.isEmpty(splits[3])?0: Integer.valueOf(splits[3]);
 
         if(mCurrentBlock==-1&&mTotalBlock==-1&&mSatCount==-1){
-            //如果是卫星定位的首批数据，直接写入
+            //GPGSV数据是分好几批发过来的，如果当前是卫星定位的首批数据，直接写入
             updateGPGSVBean(splits,callBack);
         }else {
             //如果不是首批数据，判断一下是否和前面衔接得上：
@@ -99,6 +98,9 @@ public class GPGSVBean extends BaseBean {
         //fill prns
         for(int i=1;i<5&&(mPrnIndex<mSatCount);i++){//mPrnIndex<mSatCount ：PRN数目和卫星数目是一样的。
             int index=i*4;
+            if(index>=splits.length){//防止下标越位
+                break;
+            }
             PRNBean prn=new PRNBean();
             //字段4：PRN 码（伪随机噪声码）（01 - 32）（前导位数不足则补0）
             //字段5：卫星仰角（00 - 90）度（前导位数不足则补0）
@@ -116,9 +118,10 @@ public class GPGSVBean extends BaseBean {
         }
 
         if(mTotalBlock!=mCurrentBlock){
+            //如果当前不是最后一批数据，则接着读取下一批
             mExpectBlock=mCurrentBlock+1;
         }else {
-            //dispatch sat data
+            //如果当前是最后一批数据，则发送解析后的GPGSV数据给下层调用
             callBack.onGetGPGSVBean(this.copy());
             //重置参数
             reset();
@@ -126,27 +129,39 @@ public class GPGSVBean extends BaseBean {
 
     }
 
+    /**
+     * 深拷贝
+     * @return
+     */
     private GPGSVBean copy() {
         GPGSVBean copy=new GPGSVBean();
         copy.mSatCount=this.mSatCount;
-        for(int i=0;i<mSatCount;i++){
+        for(int i=0;i<mPrns.size();i++){
             copy.mPrns.add(this.mPrns.get(i));
         }
         return copy;
     }
 
+    /**
+     * 获取所有的伪随机噪音码
+     * @return
+     */
     public ArrayList<PRNBean> getPrns() {
         return mPrns;
     }
 
+    /**
+     * 获取当前卫星总数
+     * @return
+     */
     public int getSatCount() {
         return mSatCount;
     }
 
-    public int getTotalBlock() {
-        return mTotalBlock;
-    }
 
+    /**
+     * 清空，还原到默认状态
+     */
     private synchronized void reset() {
         mCurrentBlock=-1;
         mTotalBlock=-1;
@@ -165,6 +180,10 @@ public class GPGSVBean extends BaseBean {
                 '}';
     }
 
+    /**
+     * 输出GPGSV的裸数据，如 $GPGSV,3,1,10,20,78,331,45,01,59,235,47,22,41,069,,13,32,252,45*70
+     * @return
+     */
     @Override
     public String getRawString() {
         return toString();

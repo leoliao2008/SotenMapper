@@ -13,8 +13,10 @@ import android.widget.ListView;
 import com.skycaster.sotenmapper.R;
 import com.skycaster.sotenmapper.activity.GPSTestActivity;
 import com.skycaster.sotenmapper.base.BasePresenter;
-import com.skycaster.sotenmapper.module.PowCtrlModule;
+import com.skycaster.sotenmapper.module.CDRadioModule;
+import com.skycaster.sotenmapper.module.GpsModule;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -23,8 +25,6 @@ import java.util.ArrayList;
 
 public class GPSTestPresenter extends BasePresenter {
     private GPSTestActivity mActivity;
-    private PowCtrlModule mPowCtrlModule;
-//    private GpsModule mGpsModule;
     private ListView mConsole;
     private ArrayList<String> mStrings=new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
@@ -56,6 +56,8 @@ public class GPSTestPresenter extends BasePresenter {
             updateConsole(nmea);
         }
     };
+    private GpsModule mGpsModule;
+    private CDRadioModule mCDRadioModule;
 
 
 
@@ -67,8 +69,9 @@ public class GPSTestPresenter extends BasePresenter {
     @Override
     public void onCreate() {
         PowerManager manager= (PowerManager) mActivity.getSystemService(Context.POWER_SERVICE);
+        mCDRadioModule=new CDRadioModule(manager);
         mLocationManager= (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
-        mPowCtrlModule=new PowCtrlModule(manager);
+        mGpsModule=new GpsModule(mLocationManager);
 //        mGpsModule=new GpsModule();
         initConsole();
         initActionbar();
@@ -105,39 +108,25 @@ public class GPSTestPresenter extends BasePresenter {
     }
 
     public void ctrlGpsPower(boolean isToOpen){
-        mPowCtrlModule.gpsPower(mLocationManager, isToOpen, mLocationListener, mNmeaListener);
+        if(isToOpen){
+            try {
+                mGpsModule.powerOn(mLocationListener,mNmeaListener);
+            } catch (IOException e) {
+                handleException(e);
+            }
+        }else {
+            mGpsModule.powerOff();
+        }
+
     }
 
     public void ctrlSk9042Power(boolean isToOpen){
-        mPowCtrlModule.cdRadioPower(isToOpen);
+        if(isToOpen){
+            mCDRadioModule.powerOn();
+        }else {
+            mCDRadioModule.powerOff();
+        }
     }
-
-//    public void serialPortSetting(){
-//        SharedPreferences spf = BaseApplication.getSharedPreferences();
-//        String path = spf.getString(Static.GPS_SP_PATH, Static.DEFAULT_GPS_SP_PATH);
-//        String rate = spf.getString(Static.GPS_BD_RATE, Static.DEFAULT_GPS_SP_BD_RATE);
-//        AlertDialogUtils.showAppSpConfigWindow(
-//                mActivity,
-//                path,
-//                rate,
-//                new AlertDialogCallBack(){
-//                    @Override
-//                    public void onGetSpParams(String path, String bdRate) {
-//                        try {
-//                            mGpsModule.powerOn(path, Integer.valueOf(bdRate), new GpsModule.PortDataListener() {
-//                                @Override
-//                                public void onGetPortData(byte[] data, int len) {
-//                                    updateConsole(new String(data,0,len));
-//                                }
-//                            });
-//                        } catch (Exception e) {
-//                            handleException(e);
-//                        }
-//                    }
-//                }
-//        );
-//    }
-
 
 
     @Override
@@ -158,10 +147,10 @@ public class GPSTestPresenter extends BasePresenter {
 
     @Override
     public void onStop() {
-//        if(mActivity.isFinishing()){
-//            mGpsModule.powerOff();
-//        }
-
+        if(mActivity.isFinishing()){
+            mCDRadioModule.powerOff();
+            mGpsModule.powerOff();
+        }
     }
 
     @Override

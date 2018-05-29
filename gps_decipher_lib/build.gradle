@@ -15,7 +15,7 @@ android {
     }
 
     def SDK_NAME = "GPS_DECIPHER_Lib";//jar包的名称
-    def SDK_VERSION = "_V1.0";//jar包的版本号
+    def SDK_VERSION = "_V1.5";//jar包的版本号
     def sdkDestinationPath = "build";
     def zipFile = file('build/intermediates/bundles/default/classes.jar')
 

@@ -59,21 +59,6 @@ public abstract class RequestCallBack {
 
     }
 
-    //此功能在1.4.2中被删除
-//    public void setRunningMode(boolean isSuccess) {
-//
-//    }
-
-//    /**
-//     *
-//     * @param mode 用ASCII字符串表示：
-//     *1：模式1：采用用户设置的固定的频点，使用此模式用户必须先设置频点
-//     *2：模式2：进行自动搜台模式，并将可用的频点信息写入到flash
-//     *3：模式3：采用flash中保存的频点，如果flash中没有保存频点数据，或者flash中的频点数据不能解数据，自动切换到模式2进行搜台
-//     */
-//    public void getRunningMode(String mode) {
-//
-//    }
 
     protected void toggleCKFO(boolean isSuccess) {
 
@@ -225,12 +210,10 @@ public abstract class RequestCallBack {
     /**
      * sk9042系统升级结果的回调
      * @param isSuccess 是否升级成功
-     * @param errorCode 错误码，只有在升级失败的情况下才有意义，否则为-1。
-     *1：表示升级超时
-     *2：表示bin文件校验失败
-     *注：无论出现何种错误，固件都会还原到之前的版本
+     * @param msg 附加信息。
+     * 如果升级失败，固件会还原到之前的版本。
      */
-    protected void onUpgradeFinish(boolean isSuccess, String errorCode) {
+    protected void onUpgradeFinish(boolean isSuccess, String msg) {
 
     }
 

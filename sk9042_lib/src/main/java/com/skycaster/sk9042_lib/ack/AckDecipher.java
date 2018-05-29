@@ -6,12 +6,11 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.skycaster.sk9042_lib.Static;
+import com.skycaster.sk9042_lib.request.RequestManager;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * Created by 廖华凯 on 2018/3/16.
@@ -26,8 +25,6 @@ public class AckDecipher {
     private Thread mRevThread;
     private volatile boolean isInterrupted;
     private byte[] temp=new byte[Static.ACK_SIZE];
-    private static File mUpgradeFile;
-    private static OutputStream mUpgradeOutputStream;
 
 
 
@@ -39,7 +36,7 @@ public class AckDecipher {
 
 
     /**
-     * 以串口输入流作为参数，自动新建一条线程解析串口数据
+     * 以串口输入流作为参数，自动新建一条线程解析串口数据，在子线程中调用回调返回结果
      * @param inputStream 串口输入流
      * @throws InterruptedException
      */
@@ -77,6 +74,10 @@ public class AckDecipher {
         mRevThread.start();
     }
 
+    /**
+     * 停止解析串口数据，释放资源。
+     * @throws InterruptedException
+     */
     public void stopDecipherByStream() throws InterruptedException {
         if(mRevThread!=null&&mRevThread.isAlive()){
             isInterrupted=true;
@@ -114,7 +115,7 @@ public class AckDecipher {
 
 
     /**
-     * 具体的解析函数，根据Sk9042协议编写。
+     * 具体的解析函数，根据Sk9042串口通讯协议Ver 1.5.0编写。
      * @param ack ack的容器
      * @param len 有效长度
      */
@@ -135,14 +136,14 @@ public class AckDecipher {
         }else if(trim.equals("OK")){
             mCallBack.testConnection(true);
         }
-        //测试用，正式删
-        if(split!=null){
-            for(String s:split){
-                showLog("split:"+s);
-            }
-        }else {
-            showLog("split == null!");
-        }
+//        //测试用，正式删
+//        if(split!=null){
+//            for(String s:split){
+//                showLog("split:"+s);
+//            }
+//        }else {
+//            showLog("split == null!");
+//        }
 
         if(split!=null&&split.length>0){
             switch (split[0]){
@@ -265,13 +266,8 @@ public class AckDecipher {
                     break;
                 case "GET_LDPC":
                     String[] spl2 = split[1].split(",");
-                    for(String temp:spl2){
-                        showLog("XXXXXXXXXXX:"+temp);
-                    }
                     if(spl2.length==2){
                         mCallBack.getLDPC(spl2[0],spl2[1]);
-                    }else {
-                        showLog("spl2 lengh = "+spl2.length);
                     }
                     break;
                 case "LOG":
@@ -295,7 +291,7 @@ public class AckDecipher {
                         }
                     }
                     break;
-                case "CHECK":
+                case "CHECK"://频点检查
                     //+CHECK=OK\r\n
                     //+CHECK=ERROR\r\n
                     if(split[1].equals("OK")){
@@ -304,33 +300,42 @@ public class AckDecipher {
                         mCallBack.verifyFreq(false);
                     }
                     break;
-                case "UDRC"://已接收到升级指令
+                case "UDRC"://升级第一步：已接收到升级指令
                     if(split[1].equals("OK")){
                         mCallBack.onConfirmUpgradeStart();
                     }
                     break;
-                case "UDSEND"://表示已经复位成功，用户可以开始发送bin文件
+                case "UDSEND"://升级第二步：表示已经复位成功，用户可以开始发送bin文件
                     if(split[1].equals("OK")){
-//                        //利用反射获得private方法执行升级
-//                        try {
-//                            Method commenceUpgrade = RequestCallBack.class.getMethod("commenceUpgrade", null);
-//                            commenceUpgrade.invoke(mCallBack, new Object(){});
-//                        } catch (Exception e) {
-//                            showLog("error:"+e.getMessage());
-//                        }
                         commenceUpgrade();
                     }
                     break;
-                case "STUD"://升级结果的回调
+                case "STUD"://升级第三步：升级结果的回调
                     if(split[1].equals("OK")){
-                        mCallBack.onUpgradeFinish(true,null);
+                        mCallBack.onUpgradeFinish(true,"升级成功。");
                     }else if(split[1].contains("ERROR")){
                         String[] strings = split[1].split("ERROR");
-                        String errorCode="-1";
+                        String error=null;
                         if(strings.length>1){
-                            errorCode=strings[1];
+                            switch (strings[1]){
+                                case "1":
+                                    error="升级超时。";
+                                    break;
+                                case "2":
+                                    error="bin文件长度校验失败。";
+                                    break;
+                                case "3":
+                                    error="bin文件CRC校验失败。";
+                                    break;
+                                case "4":
+                                    error="bin文件超长（最大58K）。";
+                                    break;
+                                default:
+                                    error="未知原因。";
+                                    break;
+                            }
                         }
-                        mCallBack.onUpgradeFinish(false,errorCode);
+                        mCallBack.onUpgradeFinish(false,error);
                     }
                     break;
                 default:
@@ -341,13 +346,6 @@ public class AckDecipher {
 
     }
 
-    private String hexToString(byte[] tempBytes,int len) {
-        StringBuilder sb=new StringBuilder();
-        for(int i=0;i<len;i++){
-            sb.append("0x").append(Integer.toHexString(tempBytes[i])).append(" ");
-        }
-        return sb.toString();
-    }
 
     /**
      * 通过发送升级文件，升级sk9042系统
@@ -363,7 +361,7 @@ public class AckDecipher {
                 int read=-1;
                 Handler handler=new Handler(Looper.getMainLooper());
                 try {
-                    FileInputStream inputStream=new FileInputStream(mUpgradeFile);
+                    FileInputStream inputStream=new FileInputStream(RequestManager.getSysUpgradeSrcFile());
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -371,7 +369,7 @@ public class AckDecipher {
                         }
                     });
                     while ((read=inputStream.read(temp))>0){
-                        mUpgradeOutputStream.write(temp,0,read);
+                        RequestManager.getSysUpgradeOstream().write(temp,0,read);
                     }
                     handler.post(new Runnable() {
                         @Override
@@ -381,9 +379,6 @@ public class AckDecipher {
                     });
                 } catch (Exception e) {
                     showLog(e.getMessage());
-                }finally {
-                    mUpgradeFile=null;
-                    mUpgradeOutputStream=null;
                 }
                 showLog("upgrade thread ends.");
             }
@@ -394,11 +389,4 @@ public class AckDecipher {
         Log.e(getClass().getSimpleName(),msg);
     }
 
-    public static void setUpgradeFile(File upgradeFile) {
-        mUpgradeFile = upgradeFile;
-    }
-
-    public static void setUpgradeOutputStream(OutputStream upgradeOutputStream) {
-        mUpgradeOutputStream = upgradeOutputStream;
-    }
 }

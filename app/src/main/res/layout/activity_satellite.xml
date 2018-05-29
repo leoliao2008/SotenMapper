@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.skycaster.sotenmapper.activity.SatelliteActivity">
+    tools:context="com.skycaster.sotenmapper.activity.SatelliteActivity"
+    android:keepScreenOn="true">
 
     <com.skycaster.sotenmapper.widget.SatelliteMapView
         android:id="@+id/satellite_view"

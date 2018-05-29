@@ -238,21 +238,12 @@ public class CDRadioTestPresenter extends BasePresenter {
 
         //升级四部曲，第四步：SK9042升级完成，随即重启
         @Override
-        public void onUpgradeFinish(boolean isSuccess, String errorCode) {
-            super.onUpgradeFinish(isSuccess, errorCode);
+        public void onUpgradeFinish(boolean isSuccess, String msg) {
+            super.onUpgradeFinish(isSuccess, msg);
             if(isSuccess){
                 updateConsole("升级成功！");
             }else {
-                String error="null";
-                switch (errorCode){
-                    case "1":
-                        error="升级超时";
-                        break;
-                    case "2":
-                        error="bin文件校验失败";
-                        break;
-                }
-                updateConsole("升级失败，原因："+error);
+                updateConsole("升级失败，原因："+msg);
             }
         }
     };
@@ -274,6 +265,11 @@ public class CDRadioTestPresenter extends BasePresenter {
         }catch (NullPointerException e){
             handleException(e);
         }
+        try {
+            mCdRadioModule.openConnection(mAckDecipher);
+        } catch (Exception e) {
+            handleException(e);
+        }
 
     }
 
@@ -281,11 +277,7 @@ public class CDRadioTestPresenter extends BasePresenter {
 
     @Override
     public void onStart() {
-        try {
-            mCdRadioModule.openConnection(Static.DEFAULT_CD_RADIO_SP_PATH,Integer.valueOf(Static.DEFAULT_CD_RADIO_SP_BD_RATE),mAckDecipher);
-        } catch (Exception e) {
-            handleException(e);
-        }
+
     }
 
     @Override
@@ -300,19 +292,13 @@ public class CDRadioTestPresenter extends BasePresenter {
 
     @Override
     public void onStop() {
-//        if(mActivity.isFinishing()){
-//            try {
-//                mCdRadioModule.closeConnection();
-//            } catch (Exception e) {
-//                handleException(e);
-//            }
-//            //测试用
-//            closeGpsThread();
-//        }
-        try {
-            mCdRadioModule.closeConnection();
-        } catch (Exception e) {
-            handleException(e);
+        if(mActivity.isFinishing()){
+            try {
+                mCdRadioModule.closeConnection();
+            } catch (Exception e) {
+                handleException(e);
+            }
+            mCdRadioModule.powerOff();
         }
 
     }
@@ -330,42 +316,7 @@ public class CDRadioTestPresenter extends BasePresenter {
 
     }
 
-    //此功能经串口测试稳定后不再使用
-    public void showSpSettingWindow(){
-        //3月28日为了测试展示暂时屏蔽这些代码
-        String path = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_SP_PATH, Static.DEFAULT_CD_RADIO_SP_PATH);
-        String rate = BaseApplication.getSharedPreferences().getString(Static.CD_RADIO_BD_RATES, Static.DEFAULT_CD_RADIO_SP_BD_RATE);
 
-
-        //String path = BaseApplication.getSharedPreferences().getString(Static.GPS_SP_PATH, Static.DEFAULT_GPS_SP_PATH);
-        //String rate = BaseApplication.getSharedPreferences().getString(Static.GPS_BD_RATE, Static.DEFAULT_GPS_SP_BD_RATE);
-
-        AlertDialogUtils.showAppSpConfigWindow(
-                mActivity,
-                path,
-                rate,
-                new AlertDialogCallBack(){
-                    @Override
-                    public void onGetSpParams(String path, String bdRate) {
-
-                        try {
-                            //3月28日为了测试展示暂时屏蔽这些代码
-                            SharedPreferences.Editor edit = BaseApplication.getSharedPreferences().edit();
-                            edit.putString(Static.CD_RADIO_SP_PATH,path);
-                            edit.putString(Static.CD_RADIO_BD_RATES,bdRate);
-                            edit.apply();
-                            showLog("begin to connect sp! path ="+path+", bd rate= "+bdRate);
-                            mCdRadioModule.openConnection(path,Integer.valueOf(bdRate),mAckDecipher);
-
-                            //testGpsSp(path,bdRate);//测试用
-                        } catch (Exception e) {
-                            handleException(e);
-                        }
-
-                    }
-                }
-        );
-    }
 
     private void closeGpsThread(){
         if(mGpsRevThread!=null&&mGpsRevThread.isAlive()){

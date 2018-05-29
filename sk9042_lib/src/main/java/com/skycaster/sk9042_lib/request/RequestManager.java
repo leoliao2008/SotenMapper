@@ -2,8 +2,6 @@ package com.skycaster.sk9042_lib.request;
 
 import android.util.Log;
 
-import com.skycaster.sk9042_lib.ack.AckDecipher;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,6 +16,8 @@ public class RequestManager {
     private String mAppendix="\r\n";
     private RequestManager(){}
     private volatile AtomicBoolean isSearchingFreq=new AtomicBoolean(false);
+    private static File sysUpgradeSrcFile;
+    private static OutputStream sysUpgradeOstream;
 
     /**
      * 以单例模式获得该类实例
@@ -88,18 +88,22 @@ public class RequestManager {
     /**
      * 设置频点。频点的设置注意以下三点：
      *1、在查询频点之前，如果没有手动设置频点，并且没有经过搜台，会返回NONE值。
-     *2、只能在模式1设置频点
-     *3、设置的频点数据会写入flash。
+     *2、设置的频点数据会写入flash。
      * @param os 串口输出流
-     * @param freq 频点，用ASCII字符串表示，如:9800,即设置频点为98MHz（Tuner以10KHz为单位）
+     * @param freq 频点，用ASCII字符串表示，如:9800,即设置频点为98MHz（Tuner以10KHz为单位）。频点的取值范围为[8790-10800]，超出此范围会报错。
      * @throws NumberFormatException 当参数不符合上述规定时报错
      * @throws IOException 串口输出流报错
      */
     public synchronized void setFreq(OutputStream os,String freq) throws IOException,NumberFormatException{
-        try {
-            sendRequest(os, RequestType.SET_FREQ,freq);
-        } catch (InputFormatException e) {
-            e.printStackTrace();
+        int value=Integer.valueOf(freq);
+        if(value<8790||value>10800){
+            throw new NumberFormatException("The value of freq must be within the boundary of [8790-10800]!");
+        }else {
+            try {
+                sendRequest(os, RequestType.SET_FREQ,freq);
+            } catch (InputFormatException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -385,9 +389,9 @@ public class RequestManager {
      */
     public synchronized void startUpgrade(OutputStream os,File srcFile) throws IOException {
         try {
-            //这里提取两个参数出来，要给requestCallback升级时调用
-            AckDecipher.setUpgradeFile(srcFile);
-            AckDecipher.setUpgradeOutputStream(os);
+            //这里提取两个参数出来，要给AckDecipher升级时调用
+            sysUpgradeSrcFile=srcFile;
+            sysUpgradeOstream=os;
             sendRequest(os,RequestType.SYS_UPGRADE_START,srcFile);
         } catch (InputFormatException e) {
             e.printStackTrace();
@@ -472,7 +476,6 @@ public class RequestManager {
             case RESET:
             case GET_FREQ:
             case GET_REV_MODE:
-//            case GET_RUN_MODE:
             case GET_CKFO:
             case GET_1PPS:
             case GET_TIME:
@@ -523,10 +526,9 @@ public class RequestManager {
                 }
                 break;
             case SYS_UPGRADE_START:
-                //AT+STUD:<crc>,<file_tot_len>\r\n
                 sb.append(RequestType.SYS_UPGRADE_START);
                 File src= (File) params[0];
-                sb.append(getCheckCode(src)).append(",").append(src.length()).append(mAppendix);
+                sb.append(genVerifyCode(src)).append(",").append(src.length()).append(mAppendix);
                 showLog("System upgrade command: "+sb.toString());
                 break;
             case SET_CHIP_ID:
@@ -537,14 +539,6 @@ public class RequestManager {
                     throw new InputFormatException("The length of the ID must be no less than 20.");
                 }
                 break;
-//            case SET_RUN_MODE://此功能在1.4.2版被删除
-//                Integer i1=Integer.valueOf((String)params[0]);
-//                if(i1>=1&&i1<=3){
-//                    sb=buildCmdWithParam0(rq,params[0]);
-//                }else {
-//                    throw new InputFormatException("Running mode is confined only to 1, 2, or 3.");
-//                }
-//                break;
             case SET_LOG_LEVEL:
                 Integer i2 = Integer.valueOf((String) params[0]);
                 if(i2>=0&&i2<=5){
@@ -564,23 +558,56 @@ public class RequestManager {
         os.write(sb.toString().getBytes());
     }
 
-    private String getCheckCode(File src) throws IOException {
-        FileInputStream in=new FileInputStream(src);
-        byte code= (byte) in.read();
-        byte next;
-        while ((next= (byte) in.read())!=-1){
-            code^=next;
+    /**
+     * 根据SK9042开发人员提供的C源码编写的生成升级文件校验码
+     * @param src 升级文件
+     * @return 效验码，以“0xffff”的形式返回。
+     * @throws IOException 文件读取失败弹出的异常
+     */
+    private String genVerifyCode(File src) throws IOException {
+        int len = (int) (src.length()>Integer.MAX_VALUE?Integer.MAX_VALUE:src.length());
+        //定义一个和升级文件同样大小的字节数组
+        byte[] bytes=new byte[len];
+        FileInputStream fStream=null;
+        try{
+            fStream=new FileInputStream(src);
+            //把升级文件复制到字节数组中去，为了避免和SK9042端生成的结果不一致，这里用最笨的办法，仿照SK9042开发人员的写法。
+            for(int i=0;i<len;i++){
+                bytes[i]=(byte) fStream.read();
+            }
+            //利用CRC-CCITT多项式（？？？）的方式生成升级校验码。
+            int result = processData(bytes);
+            //以“0xffff”的格式返回该校验码的字符串形式。
+            return String.format("%#x", result);
+        } finally {
+            if(fStream!=null){
+                fStream.close();
+                fStream=null;
+            }
         }
-        StringBuilder sb=new StringBuilder();
-        sb.append("0x");
-        String hexString = Integer.toHexString(code);
-        if(hexString.length()<2){
-            sb.append("0");
-        }
-        sb.append(hexString);
-        in.close();
-        return sb.toString();
     }
+
+    /**
+     * 利用CRC-CCITT多项式（？？？）的方式生成最终校验码。
+     * @param data 代表升级文件的字节数组
+     * @return 升级校验码
+     */
+    private int processData(byte[]data){
+        int result=0;
+        for(byte temp:data){
+            for(int i=0x80;i!=0;i=i>>1){
+                result= result*2;
+                if((result&0x10000)!=0){
+                    result=result^0x11021;
+                }
+                if((temp&i)!=0){
+                    result=result^(0x10000^0x11021);
+                }
+            }
+        }
+        return result;
+    }
+
 
     /**
      * 利用参数拼接发送给SK9042模块的指令
@@ -592,9 +619,24 @@ public class RequestManager {
         return new StringBuilder().append(rq.toString()).append("=").append(param).append(mAppendix);
     }
 
+
     private void showLog(String msg){
         Log.e(getClass().getSimpleName(),msg);
-
     }
 
+    /**
+     * 获取SK9042升级源文件，供SDK内部调用，开发者可以忽略这个函数。
+     * @return 升级源文件
+     */
+    public static File getSysUpgradeSrcFile() {
+        return sysUpgradeSrcFile;
+    }
+
+    /**
+     * 获取SK9042升级数据通道，供SDK内部调用，开发者可以忽略这个函数。
+     * @return 输出流
+     */
+    public static OutputStream getSysUpgradeOstream() {
+        return sysUpgradeOstream;
+    }
 }

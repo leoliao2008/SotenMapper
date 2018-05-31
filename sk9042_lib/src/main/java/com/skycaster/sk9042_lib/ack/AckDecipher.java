@@ -11,6 +11,7 @@ import com.skycaster.sk9042_lib.request.RequestManager;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * Created by 廖华凯 on 2018/3/16.
@@ -92,6 +93,8 @@ public class AckDecipher {
      * @throws InterruptedException
      */
     public synchronized void decipherByBytes(byte[] data, int len) throws InterruptedException {
+        //5月30日应马杰要求更新
+        mCallBack.onGetSerialPortData(Arrays.copyOfRange(data,0,len));
         for (int i = 0; i < len; i++) {
             if (isAckConfirmed) {
                 ack[mIndex] = data[i];

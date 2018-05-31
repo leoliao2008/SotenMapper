@@ -3,6 +3,7 @@ package com.skycaster.sotenmapper.presenter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.PowerManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -244,6 +245,15 @@ public class CDRadioTestPresenter extends BasePresenter {
                 updateConsole("升级成功！");
             }else {
                 updateConsole("升级失败，原因："+msg);
+            }
+        }
+
+        @Override
+        public void onGetSerialPortData(byte[] bytes) {
+            Log.e("raw data：",new String(bytes));
+            super.onGetSerialPortData(bytes);
+            if(mActivity.isShowSK9042RawStreamData()){
+                updateConsole(new String(bytes));
             }
         }
     };

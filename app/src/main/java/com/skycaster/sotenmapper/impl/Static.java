@@ -17,4 +17,5 @@ public interface Static {
     String BAIDU_LBS_APP_KEY="vQokgZ4ly1giDVjpPdiPw1qA2GoeMGTc";
 
     String LAST_UPDATE = "LAST_UPDATE";
+    String KEY_IS_SHOW_RAW_STREAM = "KEY_IS_SHOW_RAW_STREAM";
 }

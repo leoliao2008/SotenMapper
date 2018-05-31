@@ -24,6 +24,7 @@ public class GPSTestActivity extends BaseMVPActivity<GPSTestPresenter> {
     @BindView(R.id.list_view)
     ListView mListView;
 
+
     public static void start(Context context) {
         Intent starter = new Intent(context, GPSTestActivity.class);
         context.startActivity(starter);
@@ -70,7 +71,11 @@ public class GPSTestActivity extends BaseMVPActivity<GPSTestPresenter> {
 
     }
 
+
+
     public ListView getListView() {
         return mListView;
     }
+
+
 }

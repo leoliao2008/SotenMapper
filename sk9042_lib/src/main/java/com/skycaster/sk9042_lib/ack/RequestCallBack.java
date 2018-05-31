@@ -229,4 +229,10 @@ public abstract class RequestCallBack {
     private void showLog(String msg){
         Log.e(getClass().getSimpleName(),msg);
     }
+
+    /**
+     * 把从SK9042串口返回来的数据不加处理，直接返回。
+     * @param bytes
+     */
+    public void onGetSerialPortData(byte [] bytes){}//5月30日应马杰需求，增加一个接口，把从SK9042串口发过来的数据不加处理，直接返回。
 }

@@ -12,7 +12,8 @@ import butterknife.ButterKnife;
 
 /**
  * Created by 廖华凯 on 2018/3/12.
- * MVP模式中的base activity，注意一定要在instantiatePresenter()中初始化presenter
+ * MVP模式中的base activity，注意一定要在instantiatePresenter()中初始化presenter；
+ * 另外默认启动时绑定“芝士刀”，省去了find view by ID的烦恼。
  */
 
 public abstract class BaseMVPActivity<T extends ImplBasePresenter> extends AppCompatActivity {
